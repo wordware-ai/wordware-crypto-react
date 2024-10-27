@@ -101,27 +101,26 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className="px-3 py-3 text-md flex flex-col bg-white text-black rounded-lg transition-all duration-100 ease-in-out w-[300px] border border-gray-200"
+        className="px-3 py-3 text-md flex flex-col bg-white text-black rounded-lg w-[300px] border border-gray-200"
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
         animate={{
-          boxShadow: isHovered 
-            ? "0 0 6px 2px rgba(84, 142, 40, 0.25)"
-            : "none",
-          height: isHovered ? "auto" : "auto",
+          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.25)" : "none",
+          height: "auto",
           maxHeight: isHovered ? "200px" : "auto",
           transition: {
             height: {
               type: "spring",
-              stiffness: 300,
-              damping: 30
-            }
-          }
+              stiffness: 150,
+              damping: 20,
+              mass: 0.5,
+            },
+          },
         }}
         style={{
-          overflow: isHovered ? "auto" : "visible",
-          height: "fit-content"
+          overflow: "auto", // Changed from conditional to always auto
+          height: "fit-content",
         }}
       >
         <div className="flex items-start w-full">
@@ -137,11 +136,11 @@ const ProgressItem: React.FC<
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    transition={{ 
+                    transition={{
                       duration: 0.3,
-                      ease: [0.04, 0.62, 0.23, 0.98]
+                      ease: [0.04, 0.62, 0.23, 0.98],
                     }}
-                    className="text-sm text-wrap text-[#828282] mt-2 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar"
+                    className="text-sm text-wrap text-[#828282] mt-2 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar max-h-[120px]" // Added max-h-[120px]
                   >
                     {(() => {
                       try {
