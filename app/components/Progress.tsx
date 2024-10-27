@@ -103,10 +103,10 @@ const ProgressItem: React.FC<
       <motion.div
         className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-all duration-100 ease-in-out max-w-[300px] min-w-[150px] border border-gray-200`}
         whileHover={{
-          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
+          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.5)",
         }}
         animate={{
-          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.25)" : "none",
+          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.5)" : "none",
         }}
       >
         <div className="flex items-center justify-center w-full">
@@ -274,10 +274,14 @@ const Progress: React.FC<ProgressProps> = ({
 
   const handleScroll = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (e.deltaY > 0 && currentIndex < totalItems - visibleItems) {
-      setCurrentIndex((prev) => prev + 1);
-    } else if (e.deltaY < 0 && currentIndex > 0) {
-      setCurrentIndex((prev) => prev - 1);
+
+    const scrollUp = e.deltaY < 0;
+    const newIndex = scrollUp
+      ? Math.max(0, currentIndex - 1)
+      : Math.min(totalItems - visibleItems, currentIndex + 1);
+
+    if (newIndex !== currentIndex) {
+      setCurrentIndex(newIndex);
     }
   };
 
@@ -312,9 +316,16 @@ const Progress: React.FC<ProgressProps> = ({
           }}
         ></div>
       </div>
-      <div
+      <motion.div
         className="space-y-32 flex flex-col items-center"
         onWheel={handleScroll}
+        animate={{ y: -currentIndex * 128 }} // 128 = space-y-32 (32 * 4)
+        transition={{
+          type: "spring",
+          stiffness: 150,
+          damping: 20,
+          mass: 0.5,
+        }}
       >
         <AnimatePresence mode="popLayout">
           {displayedItems.map((item, index) => (
@@ -326,7 +337,7 @@ const Progress: React.FC<ProgressProps> = ({
               transition={{
                 duration: 0.3,
                 ease: "easeOut",
-                delay: index * 0.1, // Stagger effect
+                delay: index * 0.1,
               }}
             >
               <ProgressItem
@@ -351,7 +362,7 @@ const Progress: React.FC<ProgressProps> = ({
             </motion.div>
           ))}
         </AnimatePresence>
-      </div>
+      </motion.div>
       {/* Remove or comment out the following block to remove the indicator */}
       {/*
       {totalItems > visibleItems && (
