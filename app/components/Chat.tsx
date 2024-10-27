@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 interface ChatProps {
-  setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
+  setGenerations: React.Dispatch<React.SetStateAction<Generation[]>>;
   hoveredGenerationId: number;
-  setHoveredGenerationId: (id: number) => void;
+  setHoveredGenerationId: React.Dispatch<React.SetStateAction<number>>;
 }
 
 interface Generation {
