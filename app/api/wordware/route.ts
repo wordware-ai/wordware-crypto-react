@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { inputs, version } = body;
 
+    console.log("Request body:", body); // Log the request body
+
     if (!WORDWARE_API_KEY) {
       console.error("WORDWARE_API_KEY is not set");
       return NextResponse.json(
@@ -31,6 +33,8 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    console.log("Wordware API response status:", response.status); // Log the response status
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Wordware API error:", errorText);
@@ -46,9 +50,12 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         const reader = response.body.getReader();
+        const decoder = new TextDecoder();
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
+          const chunk = decoder.decode(value);
+          console.log("Received chunk:", chunk); // Log each chunk
           controller.enqueue(value);
         }
         controller.close();

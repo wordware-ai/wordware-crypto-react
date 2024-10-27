@@ -1,6 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+interface RunResponse {
+  status: "RUNNING" | "WAITING" | "ERROR" | "STOPPED" | "COMPLETE";
+  outputs: Record<string, any>;
+  errors: { message: string }[];
+  ask?: {
+    path: string;
+    content: {
+      type: string;
+      value: string;
+    };
+    askId: string;
+  };
+}
 
 const ApiInterface: React.FC = () => {
   const [question, setQuestion] = useState("");
@@ -13,7 +27,7 @@ const ApiInterface: React.FC = () => {
     setResponse("");
 
     try {
-      const res = await fetch("/api/wordware", {
+      const res = await fetch("/api/wordware/create-run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,11 +58,17 @@ const ApiInterface: React.FC = () => {
         for (const line of lines) {
           try {
             const parsed = JSON.parse(line);
-            if (parsed.type === "chunk" && parsed.value.type === "prompt") {
-              setResponse((prev) => prev + parsed.value.state);
+            if (parsed.type === "chunk" && typeof parsed.value === "string") {
+              setResponse((prev) => prev + parsed.value);
             }
           } catch (parseError) {
-            console.warn("Error parsing chunk:", parseError);
+            console.warn(
+              "Error parsing chunk:",
+              parseError,
+              "Raw chunk:",
+              line
+            );
+            setResponse((prev) => prev + line + "\n");
           }
         }
       }
@@ -61,7 +81,7 @@ const ApiInterface: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
+    <div className="max-w-4xl mx-auto mt-10 p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
@@ -87,14 +107,12 @@ const ApiInterface: React.FC = () => {
           {isLoading ? "Loading..." : "Submit"}
         </button>
       </form>
-      {response && (
-        <div className="mt-4">
-          <h3 className="text-lg font-medium text-gray-900">Response:</h3>
-          <pre className="mt-2 p-4 bg-gray-100 rounded-md overflow-auto whitespace-pre-wrap">
-            {response}
-          </pre>
-        </div>
-      )}
+      <div className="mt-8">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Response:</h3>
+        <p>
+          <strong>Status:</strong> {response}
+        </p>
+      </div>
     </div>
   );
 };
