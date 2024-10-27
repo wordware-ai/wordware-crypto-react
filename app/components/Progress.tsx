@@ -88,7 +88,7 @@ export default function Progress() {
           }}
         ></div>
       </div>
-      <div className="space-y-24 flex flex-col items-center">
+      <div className="space-y-48 flex flex-col items-center">
         <ProgressItem
           label="GEN 1"
           description="First generation Progress item. Represents the initial phase of the project."
