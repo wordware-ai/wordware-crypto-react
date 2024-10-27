@@ -116,7 +116,7 @@ const ProgressItem: React.FC<
             </span>
             <div className="flex flex-col flex-grow min-w-0">
               <div className="uppercase font-medium break-words">{label}</div>
-              <div className="text-sm text-wrap text-[#656462]">
+              <div className="text-sm text-wrap text-[#828282]">
                 {isSummarized && summarizedDescription
                   ? summarizedDescription
                   : description}

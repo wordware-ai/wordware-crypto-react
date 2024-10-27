@@ -248,7 +248,7 @@ const Chat: React.FC<ChatProps> = ({
     <div className="flex flex-col h-screen bg-white">
       <div className="flex-grow overflow-auto p-6">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-black mb-6">
+          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-6">
             Generations: 3db7ccbe-a884-4894-9540-c17a2fb43509
           </h3>
           <div className="p-4 rounded-lg">
@@ -281,7 +281,7 @@ const Chat: React.FC<ChatProps> = ({
                     content={
                       <div className="space-y-3 mt-2 mb-5">
                         {thoughtObj.thought && (
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-[#828282]">
                             {thoughtObj.thought}
                           </p>
                         )}
@@ -289,7 +289,7 @@ const Chat: React.FC<ChatProps> = ({
                           <ExpandableSection
                             title="Action"
                             content={
-                              <p className="text-sm text-gray-600 mt-2">
+                              <p className="text-sm text-[#828282] mt-2">
                                 {thoughtObj.action}
                               </p>
                             }
@@ -301,7 +301,7 @@ const Chat: React.FC<ChatProps> = ({
                           <ExpandableSection
                             title="Input"
                             content={
-                              <p className="text-sm text-gray-600 mt-2">
+                              <p className="text-sm text-[#828282] mt-2">
                                 {thoughtObj.input}
                               </p>
                             }
