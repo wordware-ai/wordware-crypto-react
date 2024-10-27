@@ -29,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="absolute top-4 left-4 z-[99]">
+        <div className="absolute top-4 left-6 z-[99]">
           <Image
             src="/wordware.png"
             alt="WordWare Logo"

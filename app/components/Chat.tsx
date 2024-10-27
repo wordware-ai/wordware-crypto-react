@@ -3,17 +3,18 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface StreamedResponse {
-  type: string;
-  value: string;
-  label?: string;
-  state?: string;
-}
-
 interface ChatProps {
   setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
   hoveredGenerationId: number;
   setHoveredGenerationId: (id: number) => void;
+}
+
+interface Generation {
+  label: string;
+  thought: string;
+  action: string;
+  input?: string;
+  isCompleted?: boolean;
 }
 
 const ExpandableSection: React.FC<{
@@ -129,9 +130,14 @@ const Chat: React.FC<ChatProps> = ({
   ];
 
   const updateGenerations = useCallback(
-    (newGenerations: any[]) => {
-      setLocalGenerations(newGenerations);
-      setGenerations(newGenerations);
+    (newGenerations: Generation[] | ((prev: Generation[]) => Generation[])) => {
+      if (typeof newGenerations === "function") {
+        setLocalGenerations(newGenerations);
+        setGenerations(newGenerations);
+      } else {
+        setLocalGenerations(newGenerations);
+        setGenerations(newGenerations);
+      }
     },
     [setGenerations]
   );
