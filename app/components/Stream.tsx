@@ -18,16 +18,19 @@ interface RunResponse {
 
 const ApiInterface: React.FC = () => {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<RunResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [runId, setRunId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setResponse("");
+    setResponse(null);
+    setRunId(null);
 
     try {
-      const res = await fetch("/api/wordware/create-run", {
+      // Create run
+      const createRes = await fetch("/api/wordware/create-run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,44 +41,74 @@ const ApiInterface: React.FC = () => {
         }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!createRes.ok) {
+        throw new Error(`Failed to create run: ${createRes.statusText}`);
+      }
+
+      const createData = await createRes.text();
+      console.log("Raw create run response:", createData);
+
+      let parsedData;
+      try {
+        parsedData = JSON.parse(createData);
+      } catch (parseError) {
+        console.error("Error parsing create run response:", parseError);
+        throw new Error(`Invalid JSON in create-run response: ${createData}`);
+      }
+
+      console.log("Parsed create run response:", parsedData);
+
+      if (!parsedData || typeof parsedData !== "object") {
         throw new Error(
-          `API request failed: ${errorData.error || JSON.stringify(errorData)}`
+          `Unexpected response format from create-run: ${JSON.stringify(
+            parsedData
+          )}`
         );
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter((line) => line.trim() !== "");
-
-        for (const line of lines) {
-          try {
-            const parsed = JSON.parse(line);
-            if (parsed.type === "chunk" && typeof parsed.value === "string") {
-              setResponse((prev) => prev + parsed.value);
-            }
-          } catch (parseError) {
-            console.warn(
-              "Error parsing chunk:",
-              parseError,
-              "Raw chunk:",
-              line
-            );
-            setResponse((prev) => prev + line + "\n");
-          }
-        }
+      const runId = parsedData.runId;
+      if (!runId) {
+        throw new Error(
+          `No runId in create-run response: ${JSON.stringify(parsedData)}`
+        );
       }
+
+      setRunId(runId);
+
+      // Poll for results
+      const pollInterval = setInterval(async () => {
+        const getRes = await fetch(`/api/wordware/get-run/${runId}`);
+        if (!getRes.ok) {
+          clearInterval(pollInterval);
+          throw new Error(`Failed to get run: ${getRes.statusText}`);
+        }
+
+        const getData = await getRes.text();
+        console.log("Raw get run response:", getData);
+
+        let runResult: RunResponse;
+        try {
+          runResult = JSON.parse(getData);
+          console.log("Parsed get run response:", runResult);
+        } catch (parseError) {
+          console.error("Error parsing get run response:", parseError);
+          throw new Error(`Invalid response from get-run: ${getData}`);
+        }
+
+        setResponse(runResult);
+
+        if (runResult.status === "COMPLETE" || runResult.status === "ERROR") {
+          clearInterval(pollInterval);
+          setIsLoading(false);
+        }
+      }, 1000); // Poll every second
     } catch (error) {
       console.error("Error:", error);
-      setResponse(`An error occurred: ${error.message}`);
-    } finally {
+      setResponse({
+        status: "ERROR",
+        outputs: {},
+        errors: [{ message: error.message }],
+      });
       setIsLoading(false);
     }
   };
@@ -109,9 +142,57 @@ const ApiInterface: React.FC = () => {
       </form>
       <div className="mt-8">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Response:</h3>
-        <p>
-          <strong>Status:</strong> {response}
-        </p>
+        {runId && (
+          <p>
+            <strong>Run ID:</strong> {runId}
+          </p>
+        )}
+        {response && (
+          <div>
+            <p>
+              <strong>Status:</strong>{" "}
+              <span
+                className={response.status === "ERROR" ? "text-red-500" : ""}
+              >
+                {response.status}
+              </span>
+            </p>
+            {response.status === "ERROR" && (
+              <div className="mt-4">
+                <p>
+                  <strong>Error Details:</strong>
+                </p>
+                <pre className="bg-red-100 p-2 rounded mt-2 overflow-x-auto text-red-700">
+                  {JSON.stringify(response, null, 2)}
+                </pre>
+              </div>
+            )}
+            {response.outputs && response.outputs.content && (
+              <div className="mt-4">
+                <p>
+                  <strong>Content:</strong>
+                </p>
+                <pre className="bg-gray-100 p-2 rounded mt-2 overflow-x-auto">
+                  {JSON.stringify(response.outputs.content, null, 2)}
+                </pre>
+              </div>
+            )}
+            {response.errors && response.errors.length > 0 && (
+              <div className="mt-4">
+                <p>
+                  <strong>Errors:</strong>
+                </p>
+                <ul className="list-disc pl-5">
+                  {response.errors.map((error, index) => (
+                    <li key={index} className="text-red-500">
+                      {error.message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
