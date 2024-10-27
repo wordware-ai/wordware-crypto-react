@@ -271,52 +271,58 @@ const Chat: React.FC<ChatProps> = ({
                   onMouseEnter={() => setHoveredGenerationId(index)}
                   onMouseLeave={() => setHoveredGenerationId(-1)}
                 >
-                  <ExpandableSection
-                    title={`Generation: ${generation.label}`}
-                    generationType={generation.label}
-                    isLast={index === localGenerations.length - 1}
-                    defaultExpanded={true}
-                    isCurrent={index === localGenerations.length - 1}
-                    isHovered={hoveredGenerationId === index}
-                    content={
-                      <div className="space-y-3 mt-2 mb-5">
-                        {thoughtObj.thought && (
-                          <p className="text-sm text-[#828282]">
-                            {thoughtObj.thought}
-                          </p>
-                        )}
-                        {thoughtObj.action && (
-                          <ExpandableSection
-                            title="Action"
-                            content={
-                              <p className="text-sm text-[#828282] mt-2">
-                                {thoughtObj.action}
-                              </p>
-                            }
-                            isNested
-                            defaultExpanded={false}
-                          />
-                        )}
-                        {thoughtObj.input && (
-                          <ExpandableSection
-                            title="Input"
-                            content={
-                              <p className="text-sm text-[#828282] mt-2">
-                                {thoughtObj.input}
-                              </p>
-                            }
-                            isNested
-                            defaultExpanded={false}
-                          />
-                        )}
-                        {generation.isCompleted && (
-                          <p className="text-green-600 mt-2 text-sm">
-                            Completed
-                          </p>
-                        )}
-                      </div>
-                    }
-                  />
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 }} // Stagger effect based on index
+                  >
+                    <ExpandableSection
+                      title={`Generation: ${generation.label}`}
+                      generationType={generation.label}
+                      isLast={index === localGenerations.length - 1}
+                      defaultExpanded={true}
+                      isCurrent={index === localGenerations.length - 1}
+                      isHovered={hoveredGenerationId === index}
+                      content={
+                        <div className="space-y-3 mt-2 mb-5">
+                          {thoughtObj.thought && (
+                            <p className="text-sm text-[#828282]">
+                              {thoughtObj.thought}
+                            </p>
+                          )}
+                          {thoughtObj.action && (
+                            <ExpandableSection
+                              title="Action"
+                              content={
+                                <p className="text-sm text-[#828282] mt-2">
+                                  {thoughtObj.action}
+                                </p>
+                              }
+                              isNested
+                              defaultExpanded={false}
+                            />
+                          )}
+                          {thoughtObj.input && (
+                            <ExpandableSection
+                              title="Input"
+                              content={
+                                <p className="text-sm text-[#828282] mt-2">
+                                  {thoughtObj.input}
+                                </p>
+                              }
+                              isNested
+                              defaultExpanded={false}
+                            />
+                          )}
+                          {generation.isCompleted && (
+                            <p className="text-green-600 mt-2 text-sm">
+                              Completed
+                            </p>
+                          )}
+                        </div>
+                      }
+                    />
+                  </motion.div>
                 </div>
               );
             })}
