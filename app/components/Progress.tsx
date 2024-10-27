@@ -12,6 +12,8 @@ interface Generation {
 
 interface ProgressProps {
   generations: Generation[];
+  hoveredGenerationId: number; // Add this
+  setHoveredGenerationId: (id: number) => void; // Add this
 }
 
 interface ProgressItemProps {
@@ -99,7 +101,7 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-shadow duration-200 ease-in-out max-w-[280px] min-w-[150px] border border-gray-200`}
+        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-shadow duration-200 ease-in-out max-w-[300px] min-w-[150px] border border-gray-200`}
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
@@ -142,8 +144,11 @@ const ProgressItem: React.FC<
   );
 };
 
-const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
-  const [hoveredIndex, setHoveredIndex] = useState(-1);
+const Progress: React.FC<ProgressProps> = ({
+  generations = [],
+  hoveredGenerationId,
+  setHoveredGenerationId,
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [summarizedGenerations, setSummarizedGenerations] = useState<
@@ -210,7 +215,7 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
   }, [generations, summarizeDescription]);
 
   const handleHover = (index: number) => {
-    setHoveredIndex(index);
+    setHoveredGenerationId(currentIndex + index);
   };
 
   const items =
@@ -263,7 +268,9 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
           className="absolute top-0 left-0 w-0.5 transition-all duration-300 ease-in-out"
           style={{
             height:
-              hoveredIndex >= 0 ? `${getNodePosition(hoveredIndex)}%` : "0%",
+              hoveredGenerationId >= 0
+                ? `${getNodePosition(hoveredGenerationId)}%`
+                : "0%",
             background: "linear-gradient(to bottom, #1a5d1a, #8fce00)",
           }}
         ></div>
@@ -279,7 +286,7 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
             description={item.description}
             isHighlighted={item.isHighlighted}
             isLast={item.isLast}
-            isHovered={hoveredIndex === index}
+            isHovered={hoveredGenerationId === currentIndex + index}
             onHover={handleHover}
             index={index}
             type={item.type}

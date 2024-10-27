@@ -12,6 +12,8 @@ interface StreamedResponse {
 
 interface ChatProps {
   setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
+  hoveredGenerationId: number;
+  setHoveredGenerationId: (id: number) => void;
 }
 
 const ExpandableSection: React.FC<{
@@ -22,6 +24,7 @@ const ExpandableSection: React.FC<{
   isLast?: boolean;
   defaultExpanded?: boolean;
   isCurrent?: boolean;
+  isHovered?: boolean;
 }> = ({
   title,
   content,
@@ -30,9 +33,9 @@ const ExpandableSection: React.FC<{
   isLast = false,
   defaultExpanded = true,
   isCurrent = false,
+  isHovered = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const [isHovered, setIsHovered] = useState(false);
 
   const getCircleLetter = (type: string) => {
     if (!type) return null;
@@ -53,8 +56,6 @@ const ExpandableSection: React.FC<{
   return (
     <div
       className={`${isNested ? "mb-4 ml-6" : "flex"}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {!isNested && (
         <div className="mr-4 flex flex-col items-center">
@@ -94,7 +95,11 @@ const ExpandableSection: React.FC<{
   );
 };
 
-const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
+const Chat: React.FC<ChatProps> = ({ 
+  setGenerations, 
+  hoveredGenerationId, 
+  setHoveredGenerationId 
+}) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -260,13 +265,19 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
               }
 
               return (
-                <div key={index} className="pt-2">
+                <div 
+                  key={index} 
+                  className="pt-2"
+                  onMouseEnter={() => setHoveredGenerationId(index)}
+                  onMouseLeave={() => setHoveredGenerationId(-1)}
+                >
                   <ExpandableSection
                     title={`Generation: ${generation.label}`}
                     generationType={generation.label}
                     isLast={index === localGenerations.length - 1}
                     defaultExpanded={true}
                     isCurrent={index === localGenerations.length - 1}
+                    isHovered={hoveredGenerationId === index}
                     content={
                       <div className="space-y-3 mt-2 mb-5">
                         {thoughtObj.thought && (
