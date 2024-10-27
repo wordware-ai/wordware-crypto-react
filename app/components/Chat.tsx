@@ -165,27 +165,36 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
       <div className="flex-grow overflow-auto p-4">
         <div className="max-w-4xl mx-auto">
           <h3 className="text-lg font-medium text-black mb-4">Generations:</h3>
-          {localGenerations.map((generation, index) => (
-            <div key={index} className="mb-4 p-4 border rounded-md">
-              <h4 className="font-bold">Generation: {generation.label}</h4>
-              <p>
-                <strong>Thought:</strong> {generation.thought}
-              </p>
-              <div>
-                <strong>Action:</strong>
-                {generation.action && <pre>{generation.action}</pre>}
+          {localGenerations.map((generation, index) => {
+            let thoughtObj;
+            try {
+              thoughtObj = JSON.parse(generation.thought);
+            } catch (e) {
+              thoughtObj = {
+                thought: generation.thought,
+                action: "",
+                input: "",
+              };
+            }
+
+            return (
+              <div key={index} className="mb-4 p-4 border rounded-md">
+                <h4 className="font-bold">Generation: {generation.label}</h4>
+                <p>
+                  <strong>Thought:</strong> "thought": "{thoughtObj.thought}"
+                </p>
+                <p>
+                  <strong>Action:</strong> "action": "{thoughtObj.action}"
+                </p>
+                <p>
+                  <strong>Input:</strong> "input": "{thoughtObj.input}"
+                </p>
+                {generation.isCompleted && (
+                  <p className="text-green-600">Completed</p>
+                )}
               </div>
-              {generation.input && (
-                <div>
-                  <strong>Input:</strong>
-                  <pre>{generation.input}</pre>
-                </div>
-              )}
-              {generation.isCompleted && (
-                <p className="text-green-600">Completed</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
           <h3 className="text-lg font-medium text-black mb-4">
             Final Response:
           </h3>
