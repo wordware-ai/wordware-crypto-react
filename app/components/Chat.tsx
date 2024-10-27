@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 
 interface StreamedResponse {
   type: string;
@@ -17,25 +18,48 @@ const ExpandableSection: React.FC<{
   title: string;
   content: React.ReactNode;
   isNested?: boolean;
-  showDot?: boolean;
+  generationType?: string;
   isLast?: boolean;
   defaultExpanded?: boolean;
+  isCurrent?: boolean;
 }> = ({
   title,
   content,
   isNested = false,
-  showDot = false,
+  generationType = "",
   isLast = false,
-  defaultExpanded = false,
+  defaultExpanded = true,
+  isCurrent = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const getCircleLetter = (type: string) => {
+    if (!type) return null;
+    const firstLetter = type.charAt(0).toUpperCase();
+    return (
+      <motion.div
+        className={`w-6 h-6 rounded-full bg-[#538E28] flex items-center justify-center text-xs font-medium text-white
+        ${isCurrent ? "animate-pulse-shadow" : ""}`}
+        animate={
+          isHovered ? { boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.5)" } : {}
+        }
+      >
+        {firstLetter}
+      </motion.div>
+    );
+  };
 
   return (
-    <div className={`${isNested ? "mb-2 ml-6" : "flex"}`}>
-      {showDot && (
-        <div className="mr-2 flex flex-col items-center ">
-          <div className="w-2 h-2 bg-gray-400 rounded-full "></div>
-          {!isLast && <div className="w-0.5 bg-gray-300 flex-grow"></div>}
+    <div
+      className={`${isNested ? "mb-4 ml-6" : "flex"}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {!isNested && (
+        <div className="mr-4 flex flex-col items-center">
+          <div className="mb-2">{getCircleLetter(generationType)}</div>
+          {!isLast && <div className="w-[1px] bg-[#969696] flex-grow"></div>}
         </div>
       )}
       <div className={`flex-grow ${isNested ? "pl-4" : ""}`}>
@@ -218,11 +242,11 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-white ">
-      <div className="flex-grow overflow-auto p-4 ">
-        <div className="max-w-4xl mx-auto ">
-          <h3 className="text-lg  font-medium text-black mb-4">Generations:</h3>
-          <div className="space-y-2 p-4 rounded-lg">
+    <div className="flex flex-col h-screen bg-white">
+      <div className="flex-grow overflow-auto p-6">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-lg font-medium text-black mb-6">Generations:</h3>
+          <div className="p-4 rounded-lg">
             {localGenerations.map((generation, index) => {
               let thoughtObj;
               try {
@@ -236,56 +260,53 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
               }
 
               return (
-                <ExpandableSection
-                  key={index}
-                  title={`Generation: ${generation.label}`}
-                  showDot={true}
-                  isLast={index === localGenerations.length - 1}
-                  defaultExpanded={true}
-                  content={
-                    <div className="space-y-2 mt-2 ml-[-1.5rem] pl-6">
-                      {thoughtObj.thought && (
-                        <ExpandableSection
-                          title="Thought"
-                          content={
-                            <p className="text-sm text-gray-600">
-                              {thoughtObj.thought}
-                            </p>
-                          }
-                          isNested
-                          defaultExpanded={false}
-                        />
-                      )}
-                      {thoughtObj.action && (
-                        <ExpandableSection
-                          title="Action"
-                          content={
-                            <p className="text-sm text-gray-600">
-                              {thoughtObj.action}
-                            </p>
-                          }
-                          isNested
-                          defaultExpanded={false}
-                        />
-                      )}
-                      {thoughtObj.input && (
-                        <ExpandableSection
-                          title="Input"
-                          content={
-                            <p className="text-sm text-gray-600">
-                              {thoughtObj.input}
-                            </p>
-                          }
-                          isNested
-                          defaultExpanded={false}
-                        />
-                      )}
-                      {generation.isCompleted && (
-                        <p className="text-green-600 mt-2 text-sm">Completed</p>
-                      )}
-                    </div>
-                  }
-                />
+                <div key={index} className="pt-2">
+                  <ExpandableSection
+                    title={`Generation: ${generation.label}`}
+                    generationType={generation.label}
+                    isLast={index === localGenerations.length - 1}
+                    defaultExpanded={true}
+                    isCurrent={index === localGenerations.length - 1}
+                    content={
+                      <div className="space-y-3 mt-2 mb-5">
+                        {thoughtObj.thought && (
+                          <p className="text-sm text-gray-600">
+                            {thoughtObj.thought}
+                          </p>
+                        )}
+                        {thoughtObj.action && (
+                          <ExpandableSection
+                            title="Action"
+                            content={
+                              <p className="text-sm text-gray-600 mt-2">
+                                {thoughtObj.action}
+                              </p>
+                            }
+                            isNested
+                            defaultExpanded={false}
+                          />
+                        )}
+                        {thoughtObj.input && (
+                          <ExpandableSection
+                            title="Input"
+                            content={
+                              <p className="text-sm text-gray-600 mt-2">
+                                {thoughtObj.input}
+                              </p>
+                            }
+                            isNested
+                            defaultExpanded={false}
+                          />
+                        )}
+                        {generation.isCompleted && (
+                          <p className="text-green-600 mt-2 text-sm">
+                            Completed
+                          </p>
+                        )}
+                      </div>
+                    }
+                  />
+                </div>
               );
             })}
           </div>
