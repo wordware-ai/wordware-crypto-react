@@ -1,16 +1,79 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const body = await request.json();
-  const { inputs, version } = body;
+const WORDWARE_API_URL =
+  "https://app.wordware.ai/api/released-app/3db7ccbe-a884-4894-9540-c17a2fb43509/run";
+const WORDWARE_API_KEY = process.env.WORDWARE_API_KEY;
 
-  // Here you would typically process the input and generate a response
-  // For now, we'll just echo back the received data
-  const response = {
-    inputs,
-    version,
-    message: "This is a mock response from the Wordware API",
-  };
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { inputs, version } = body;
 
-  return NextResponse.json(response);
+    if (!WORDWARE_API_KEY) {
+      console.error("WORDWARE_API_KEY is not set");
+      return NextResponse.json(
+        { error: "API key is not set" },
+        { status: 500 }
+      );
+    }
+
+    const response = await fetch(`${WORDWARE_API_URL}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${WORDWARE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: {
+          question: inputs.question,
+        },
+        version: version || "^3.4",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Wordware API error:", errorText);
+      return NextResponse.json(
+        {
+          error: `Wordware API responded with status ${response.status}: ${errorText}`,
+        },
+        { status: response.status }
+      );
+    }
+
+    // Create a new ReadableStream to forward the response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          controller.enqueue(value);
+        }
+        controller.close();
+      },
+    });
+
+    return new NextResponse(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
+  } catch (error) {
+    console.error("Error in API route:", error);
+    return NextResponse.json(
+      { error: `An error occurred: ${error.message}` },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { message: "GET method is not supported for this endpoint" },
+    { status: 405 }
+  );
 }

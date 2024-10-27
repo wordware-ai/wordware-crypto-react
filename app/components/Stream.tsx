@@ -10,6 +10,7 @@ const ApiInterface: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setResponse("");
 
     try {
       const res = await fetch("/api/wordware", {
@@ -23,26 +24,34 @@ const ApiInterface: React.FC = () => {
         }),
       });
 
-      const textResponse = await res.text();
-      console.log("Raw response:", textResponse); // Log the raw response
-
-      let data;
-      try {
-        data = JSON.parse(textResponse);
-      } catch (parseError) {
-        console.error("JSON Parse Error:", parseError);
-        setResponse(
-          `Failed to parse API response. Raw response:\n\n${textResponse}`
-        );
-        setIsLoading(false);
-        return;
-      }
-
       if (!res.ok) {
-        throw new Error(`API request failed: ${JSON.stringify(data)}`);
+        const errorData = await res.json();
+        throw new Error(
+          `API request failed: ${errorData.error || JSON.stringify(errorData)}`
+        );
       }
 
-      setResponse(JSON.stringify(data, null, 2));
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n").filter((line) => line.trim() !== "");
+
+        for (const line of lines) {
+          try {
+            const parsed = JSON.parse(line);
+            if (parsed.type === "chunk" && parsed.value.type === "prompt") {
+              setResponse((prev) => prev + parsed.value.state);
+            }
+          } catch (parseError) {
+            console.warn("Error parsing chunk:", parseError);
+          }
+        }
+      }
     } catch (error) {
       console.error("Error:", error);
       setResponse(`An error occurred: ${error.message}`);
@@ -81,7 +90,7 @@ const ApiInterface: React.FC = () => {
       {response && (
         <div className="mt-4">
           <h3 className="text-lg font-medium text-gray-900">Response:</h3>
-          <pre className="mt-2 p-4 bg-gray-100 rounded-md overflow-auto">
+          <pre className="mt-2 p-4 bg-gray-100 rounded-md overflow-auto whitespace-pre-wrap">
             {response}
           </pre>
         </div>
