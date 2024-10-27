@@ -18,11 +18,15 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [processSteps, setProcessSteps] = useState<
+    Array<{ thought: string; action: string; input: string }>
+  >([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setResponse("");
+    setProcessSteps([]);
     setGenerations([]); // Reset generations at the start of a new query
 
     abortControllerRef.current = new AbortController();
@@ -64,7 +68,7 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
 
               if (value.type === "generation") {
                 if (value.state === "start") {
-                  console.log("New generation:", value); // Add this line
+                  console.log("New generation:", value);
                   setGenerations((prev) => {
                     const newGenerations = [
                       ...prev,
@@ -74,7 +78,7 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                         action: value.action || "",
                       },
                     ];
-                    console.log("Updated generations:", newGenerations); // Add this line
+                    console.log("Updated generations:", newGenerations);
                     return newGenerations;
                   });
                 } else if (value.state === "end") {
@@ -97,7 +101,7 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                       ? {
                           ...gen,
                           thought: gen.thought + (value.value ?? ""),
-                          action: gen.action || value.action || "", // Update action if it exists
+                          action: gen.action || value.action || "",
                         }
                       : gen
                   )
@@ -137,8 +141,26 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
     <div className="flex flex-col h-screen bg-white">
       <div className="flex-grow overflow-auto p-4">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg font-medium text-black mb-4">Response:</h3>
-          <div className=" p-4 rounded-md text-black">
+          <h3 className="text-lg font-medium text-black mb-4">
+            Thought Process:
+          </h3>
+          {processSteps.map((step, index) => (
+            <div key={index} className="mb-4 p-4 border rounded-md">
+              <p>
+                <strong>Thought:</strong> {step.thought}
+              </p>
+              <p>
+                <strong>Action:</strong> {step.action}
+              </p>
+              <p>
+                <strong>Input:</strong> {step.input}
+              </p>
+            </div>
+          ))}
+          <h3 className="text-lg font-medium text-black mb-4">
+            Final Response:
+          </h3>
+          <div className="p-4 rounded-md text-black">
             <pre className="whitespace-pre-wrap">{response}</pre>
           </div>
         </div>
