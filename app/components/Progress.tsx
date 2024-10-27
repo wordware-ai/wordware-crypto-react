@@ -101,7 +101,7 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className="px-3 py-3 text-md flex flex-col bg-white text-black rounded-lg w-[300px] border border-gray-200"
+        className="px-3 py-3 text-md flex flex-col bg-white text-black  rounded-lg w-[300px] border border-gray-200"
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
@@ -125,7 +125,7 @@ const ProgressItem: React.FC<
       >
         <div className="flex items-start w-full">
           <div className="flex items-start w-full">
-            <span className="mr-3 flex-shrink-0 bg-[#548E28] p-1 mt-1 rounded-md">
+            <span className="mr-3 flex-shrink-0 bg-gradient-to-tl from-black/80 to-[#65ab30] p-1 mt-1 rounded-md">
               {getIcon()}
             </span>
             <div className="flex flex-col flex-grow min-w-0 w-full">

@@ -42,7 +42,7 @@ const ExpandableSection: React.FC<{
     const firstLetter = type.charAt(0).toUpperCase();
     return (
       <motion.div
-        className={`w-6 h-6 rounded-full bg-[#538E28] flex items-center justify-center text-xs font-medium text-white
+        className={`w-7 h-7 rounded-full bg-[#538E28] flex items-center justify-center text-xs font-medium text-white
         ${isCurrent ? "animate-pulse-shadow" : ""}`}
         animate={
           isHovered ? { boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.5)" } : {}
@@ -114,6 +114,14 @@ const Chat: React.FC<ChatProps> = ({
       isCompleted?: boolean;
     }>
   >([]);
+  const [inputValue, setInputValue] = useState("");
+  const [promptValue, setPromptValue] = useState("");
+  const suggestions = [
+    "Price of BTC?",
+    "Price of ETH?",
+    "UNI market cap?",
+    "AAVE volume?",
+  ];
 
   const updateGenerations = useCallback(
     (newGenerations: any[]) => {
@@ -248,10 +256,10 @@ const Chat: React.FC<ChatProps> = ({
     <div className="flex flex-col h-screen bg-white">
       <div className="flex-grow overflow-auto p-6">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-6">
+          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-3">
             Generations: 3db7ccbe-a884-4894-9540-c17a2fb43509
           </h3>
-          <div className="p-4 rounded-lg">
+          <div className="p-0 rounded-lg">
             {localGenerations.map((generation, index) => {
               let thoughtObj;
               try {
@@ -333,15 +341,37 @@ const Chat: React.FC<ChatProps> = ({
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg ">
             <div className="p-4">
+              <div className="space-y-4">
+                <motion.div
+                  className="flex flex-wrap gap-2 mb-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {suggestions.map((suggestion, index) => (
+                    <motion.button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => setQuestion(suggestion)}
+                      className="px-3 py-1 text-sm text-gray-600 bg-[#F6F4EE] rounded-full hover:text-white hover:bg-[#548E28] transition-colors"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2, delay: index * 0.1 }}
+                    >
+                      {suggestion}
+                    </motion.button>
+                  ))}
+                </motion.div>
+              </div>
               <form
                 onSubmit={handleSubmit}
-                className="flex items-center space-x-4"
+                className="flex items-center space-x-4 mt-4"
               >
                 <textarea
                   id="question"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  className="flex-grow rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="flex-grow border-[#969696] rounded-md border-[1px] py-3 px-3 focus:ring focus:ring-[#538E28] focus:ring-opacity-50 placeholder:text-sm placeholder:text-[#969696] text-[#969696] text-sm"
                   rows={1}
                   placeholder="Type your message here..."
                   required
@@ -349,7 +379,7 @@ const Chat: React.FC<ChatProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="px-4 py-3  rounded-md  text-sm font-normal text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 "
                 >
                   {isLoading ? "Loading..." : "Submit"}
                 </button>
