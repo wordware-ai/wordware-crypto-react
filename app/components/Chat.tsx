@@ -16,17 +16,34 @@ interface ChatProps {
 const ExpandableSection: React.FC<{
   title: string;
   content: React.ReactNode;
-}> = ({ title, content }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  isNested?: boolean;
+  showDot?: boolean;
+  isLast?: boolean;
+  defaultExpanded?: boolean;
+}> = ({
+  title,
+  content,
+  isNested = false,
+  showDot = false,
+  isLast = false,
+  defaultExpanded = false,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div className="mb-2  rounded-md overflow-hidden ">
-      <div
-        className="flex items-center justify-between p-3 cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <div className="flex items-center">
-          <span className="mr-2 w-4 h-4">
+    <div className={`${isNested ? "mb-2 ml-6" : "flex"}`}>
+      {showDot && (
+        <div className="mr-2 flex flex-col items-center ">
+          <div className="w-2 h-2 bg-gray-400 rounded-full "></div>
+          {!isLast && <div className="w-0.5 bg-gray-300 flex-grow"></div>}
+        </div>
+      )}
+      <div className={`flex-grow ${isNested ? "pl-4" : ""}`}>
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span className="mr-2 w-4 h-4 flex-shrink-0">
             {isExpanded ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -45,10 +62,10 @@ const ExpandableSection: React.FC<{
               </svg>
             )}
           </span>
-          <p className="text-sm text-black ">{title}</p>
+          <p className="text-sm font-normal text-black">{title}</p>
         </div>
+        {isExpanded && <div className="mt-2 text-[#538E28]">{content}</div>}
       </div>
-      {isExpanded && <div className="p-3">{content}</div>}
     </div>
   );
 };
@@ -201,56 +218,76 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-[#FFF]">
-      <div className="flex-grow overflow-auto p-4">
-        <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg  text-black mb-4">Generations:</h3>
-          {localGenerations.map((generation, index) => {
-            let thoughtObj;
-            try {
-              thoughtObj = JSON.parse(generation.thought);
-            } catch (e) {
-              thoughtObj = {
-                thought: generation.thought,
-                action: "",
-                input: "",
-              };
-            }
+    <div className="flex flex-col h-screen bg-white ">
+      <div className="flex-grow overflow-auto p-4 ">
+        <div className="max-w-4xl mx-auto ">
+          <h3 className="text-lg  font-medium text-black mb-4">Generations:</h3>
+          <div className="space-y-2 p-4 rounded-lg">
+            {localGenerations.map((generation, index) => {
+              let thoughtObj;
+              try {
+                thoughtObj = JSON.parse(generation.thought);
+              } catch (e) {
+                thoughtObj = {
+                  thought: generation.thought,
+                  action: "",
+                  input: "",
+                };
+              }
 
-            return (
-              <ExpandableSection
-                key={index}
-                title={`Generation: ${generation.label}`}
-                content={
-                  <>
-                    <ExpandableSection
-                      title="Thought"
-                      content={
-                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"thought": "${thoughtObj.thought}"`}</p>
-                      }
-                    />
-                    <ExpandableSection
-                      title="Action"
-                      content={
-                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"action": "${thoughtObj.action}"`}</p>
-                      }
-                    />
-                    <ExpandableSection
-                      title="Input"
-                      content={
-                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"input": "${thoughtObj.input}"`}</p>
-                      }
-                    />
-                    {generation.isCompleted && (
-                      <p className="text-green-600 mt-2 text-sm ">Completed</p>
-                    )}
-                  </>
-                }
-              />
-            );
-          })}
-          <div className="p-4 rounded-md text-black">
-            <pre className="whitespace-pre-wrap">{response}</pre>
+              return (
+                <ExpandableSection
+                  key={index}
+                  title={`Generation: ${generation.label}`}
+                  showDot={true}
+                  isLast={index === localGenerations.length - 1}
+                  defaultExpanded={true}
+                  content={
+                    <div className="space-y-2 mt-2 ml-[-1.5rem] pl-6">
+                      {thoughtObj.thought && (
+                        <ExpandableSection
+                          title="Thought"
+                          content={
+                            <p className="text-sm text-gray-600">
+                              {thoughtObj.thought}
+                            </p>
+                          }
+                          isNested
+                          defaultExpanded={false}
+                        />
+                      )}
+                      {thoughtObj.action && (
+                        <ExpandableSection
+                          title="Action"
+                          content={
+                            <p className="text-sm text-gray-600">
+                              {thoughtObj.action}
+                            </p>
+                          }
+                          isNested
+                          defaultExpanded={false}
+                        />
+                      )}
+                      {thoughtObj.input && (
+                        <ExpandableSection
+                          title="Input"
+                          content={
+                            <p className="text-sm text-gray-600">
+                              {thoughtObj.input}
+                            </p>
+                          }
+                          isNested
+                          defaultExpanded={false}
+                        />
+                      )}
+                      {generation.isCompleted && (
+                        <p className="text-green-600 mt-2 text-sm">Completed</p>
+                      )}
+                    </div>
+                  }
+                />
+              );
+            })}
           </div>
         </div>
       </div>
