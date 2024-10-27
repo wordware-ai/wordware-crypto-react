@@ -106,9 +106,7 @@ const ProgressItem: React.FC<
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
         animate={{
-          boxShadow: isHovered 
-            ? "0 0 6px 2px rgba(84, 142, 40, 0.25)"
-            : "none"
+          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.25)" : "none",
         }}
       >
         <div className="flex items-center justify-center w-full">
@@ -138,10 +136,19 @@ const ProgressItem: React.FC<
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="absolute top-full mt-2 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-20 w-[280px] max-h-[200px] overflow-y-auto"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="absolute top-full mt-2 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-[99] w-[280px] max-h-[200px] overflow-y-auto"
           >
-            <p className="text-sm text-black">{description}</p>
+            <p className="text-sm text-black whitespace-pre-wrap break-words">
+              {(() => {
+                try {
+                  const thoughtObj = JSON.parse(description);
+                  return thoughtObj.thought || description;
+                } catch (e) {
+                  return description;
+                }
+              })()}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -191,12 +198,13 @@ const Progress: React.FC<ProgressProps> = ({
     if (hoveredGenerationId >= 0) {
       if (hoveredGenerationId < currentIndex) {
         setCurrentIndex(hoveredGenerationId);
-      }
-      else if (hoveredGenerationId >= currentIndex + visibleItems) {
-        setCurrentIndex(Math.min(
-          hoveredGenerationId - visibleItems + 1,
-          totalItems - visibleItems
-        ));
+      } else if (hoveredGenerationId >= currentIndex + visibleItems) {
+        setCurrentIndex(
+          Math.min(
+            hoveredGenerationId - visibleItems + 1,
+            totalItems - visibleItems
+          )
+        );
       }
     }
   }, [hoveredGenerationId, currentIndex, totalItems, visibleItems]);
@@ -308,28 +316,41 @@ const Progress: React.FC<ProgressProps> = ({
         className="space-y-32 flex flex-col items-center"
         onWheel={handleScroll}
       >
-        {displayedItems.map((item, index) => (
-          <ProgressItem
-            key={currentIndex + index}
-            label={item.label}
-            description={item.description}
-            isHighlighted={item.isHighlighted}
-            isLast={item.isLast}
-            isHovered={hoveredGenerationId === currentIndex + index}
-            onHover={handleHover}
-            index={index}
-            type={item.type}
-            action={item.action}
-            summarizedDescription={
-              summarizedGenerations.find((g) => g.label === item.label)
-                ?.summarizedDescription
-            }
-            isSummarized={
-              summarizedGenerations.find((g) => g.label === item.label)
-                ?.isSummarized || false
-            }
-          />
-        ))}
+        <AnimatePresence mode="popLayout">
+          {displayedItems.map((item, index) => (
+            <motion.div
+              key={currentIndex + index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{
+                duration: 0.3,
+                ease: "easeOut",
+                delay: index * 0.1, // Stagger effect
+              }}
+            >
+              <ProgressItem
+                label={item.label}
+                description={item.description}
+                isHighlighted={item.isHighlighted}
+                isLast={item.isLast}
+                isHovered={hoveredGenerationId === currentIndex + index}
+                onHover={handleHover}
+                index={index}
+                type={item.type}
+                action={item.action}
+                summarizedDescription={
+                  summarizedGenerations.find((g) => g.label === item.label)
+                    ?.summarizedDescription
+                }
+                isSummarized={
+                  summarizedGenerations.find((g) => g.label === item.label)
+                    ?.isSummarized || false
+                }
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
       {/* Remove or comment out the following block to remove the indicator */}
       {/*
