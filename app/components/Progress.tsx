@@ -252,15 +252,16 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
     <div className="w-full h-full flex flex-col justify-center  items-center bg-[#FDFAF5] relative overflow-hidden dotted-background">
       <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#969696] transform -translate-x-1/2">
         <div
-          className="absolute top-0 left-0 w-0.5 bg-[#AFAFAF]  transition-all duration-300 ease-in-out"
+          className="absolute top-0 left-0 w-0.5 transition-all duration-300 ease-in-out"
           style={{
             height:
               hoveredIndex >= 0 ? `${getNodePosition(hoveredIndex)}%` : "0%",
+            background: "linear-gradient(to bottom, #1a5d1a, #8fce00)",
           }}
         ></div>
       </div>
       <div
-        className="space-y-40 flex flex-col items-center"
+        className="space-y-32 flex flex-col items-center"
         onWheel={handleScroll}
       >
         {displayedItems.map((item, index) => (

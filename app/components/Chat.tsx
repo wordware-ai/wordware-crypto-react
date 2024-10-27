@@ -134,36 +134,42 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label
-            htmlFor="question"
-            className="block text-sm font-medium text-black"
-          >
-            Question
-          </label>
-          <textarea
-            id="question"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            rows={4}
-            required
-          />
+    <div className="flex flex-col h-screen bg-white">
+      <div className="flex-grow overflow-auto p-4">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-lg font-medium text-black mb-4">Response:</h3>
+          <div className=" p-4 rounded-md text-black">
+            <pre className="whitespace-pre-wrap">{response}</pre>
+          </div>
         </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          {isLoading ? "Loading..." : "Submit"}
-        </button>
-      </form>
-      <div className="mt-8">
-        <h3 className="text-lg font-medium text-black mb-4">Response:</h3>
-        <div className="bg-gray-100 p-4 rounded-md text-black">
-          <pre className="whitespace-pre-wrap">{response}</pre>
+      </div>
+      <div className="p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg border-2 border-gray-200">
+            <div className="p-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex items-center space-x-4"
+              >
+                <textarea
+                  id="question"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  className="flex-grow rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  rows={1}
+                  placeholder="Type your message here..."
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {isLoading ? "Loading..." : "Submit"}
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
