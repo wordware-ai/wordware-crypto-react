@@ -101,7 +101,7 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className="px-3 py-3 text-md flex flex-col bg-white text-black  rounded-lg w-[300px] border border-gray-200"
+        className="px-3 py-3 text-md flex flex-col bg-white text-black  rounded-lg w-[300px] border-[2px] border-gray-200"
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
@@ -204,7 +204,7 @@ const Progress: React.FC<ProgressProps> = ({
       : [
           {
             label: "START",
-            description: "Initial state",
+            description: "Enter a question to get started!",
             isHighlighted: true,
             isLast: true,
             type: "OTHER",
@@ -324,7 +324,7 @@ const Progress: React.FC<ProgressProps> = ({
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center bg-[#FDFAF5] relative overflow-hidden dotted-background">
-      <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#969696] transform -translate-x-1/2">
+      <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-[#E5E7EB] transform -translate-x-1/2">
         <div
           className="absolute top-0 left-0 w-0.5 transition-all duration-300 ease-in-out"
           style={{

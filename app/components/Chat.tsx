@@ -58,12 +58,12 @@ const ExpandableSection: React.FC<{
       {!isNested && (
         <div className="mr-4 flex flex-col items-center">
           <div className="mb-2">{getCircleLetter(generationType)}</div>
-          {!isLast && <div className="w-[1px] bg-[#969696] flex-grow"></div>}
+          {!isLast && <div className="w-[2px] bg-[#E5E7EB] flex-grow"></div>}
         </div>
       )}
       <div className={`flex-grow ${isNested ? "pl-4" : ""}`}>
         <div
-          className="flex items-center cursor-pointer"
+          className="flex items-center cursor-pointer rounded-md p-2 hover:bg-[#FDFAF5] transition-colors duration-200"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <span className="mr-2 w-4 h-4 flex-shrink-0">
@@ -87,7 +87,16 @@ const ExpandableSection: React.FC<{
           </span>
           <p className="text-sm font-normal text-black">{title}</p>
         </div>
-        {isExpanded && <div className="mt-2 text-[#538E28]">{content}</div>}
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="mt-2 text-[#538E28]"
+          >
+            {content}
+          </motion.div>
+        )}
       </div>
     </div>
   );
@@ -102,9 +111,7 @@ const Chat: React.FC<ChatProps> = ({
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const [processSteps, setProcessSteps] = useState<
-    Array<{ thought: string; action: string; input: string }>
-  >([]);
+
   const [localGenerations, setLocalGenerations] = useState<
     Array<{
       label: string;
@@ -114,8 +121,6 @@ const Chat: React.FC<ChatProps> = ({
       isCompleted?: boolean;
     }>
   >([]);
-  const [inputValue, setInputValue] = useState("");
-  const [promptValue, setPromptValue] = useState("");
   const suggestions = [
     "Price of BTC?",
     "Price of ETH?",
@@ -253,11 +258,12 @@ const Chat: React.FC<ChatProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <div className="flex-grow overflow-auto p-6">
-        <div className="max-w-4xl mx-auto">
+    <div className="flex flex-col h-screen bg-white ">
+      <div className="flex-grow overflow-auto p-6 ">
+        <div className="max-w-4xl mx-auto ">
           <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-3">
-            Generations: 3db7ccbe-a884-4894-9540-c17a2fb43509
+            <span className="uppercase text-[#457522]">APP ID:</span>{" "}
+            3db7ccbe-a884-4894-9540-c17a2fb43509
           </h3>
           <div className="p-0 rounded-lg">
             {localGenerations.map((generation, index) => {
@@ -292,7 +298,7 @@ const Chat: React.FC<ChatProps> = ({
                       isCurrent={index === localGenerations.length - 1}
                       isHovered={hoveredGenerationId === index}
                       content={
-                        <div className="space-y-3 mt-2 mb-5">
+                        <div className="space-y-1 mt-2 mb-5">
                           {thoughtObj.thought && (
                             <p className="text-sm text-[#828282]">
                               {thoughtObj.thought}
@@ -337,7 +343,7 @@ const Chat: React.FC<ChatProps> = ({
           </div>
         </div>
       </div>
-      <div className="p-4">
+      <div className="">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg ">
             <div className="p-4">
@@ -381,7 +387,7 @@ const Chat: React.FC<ChatProps> = ({
                   disabled={isLoading}
                   className="px-4 py-3  rounded-md  text-sm font-normal text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 "
                 >
-                  {isLoading ? "Loading..." : "Submit"}
+                  {isLoading ? "Running..." : "Submit"}
                 </button>
               </form>
             </div>

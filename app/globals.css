@@ -22,9 +22,12 @@ body {
 
 .dotted-background {
   position: relative;
-  background-image: radial-gradient(rgba(128, 128, 128, 0.2) 1px, transparent 1px);
+  background-image: radial-gradient(
+    rgba(128, 128, 128, 0.2) 1px,
+    transparent 1px
+  );
   background-size: 30px 30px;
-  background-color: #FDFAF5;
+  background-color: #fdfaf5;
 }
 
 .dotted-background::before {
@@ -38,7 +41,7 @@ body {
     ellipse at center,
     transparent 0%,
     transparent 50%,
-    #FDFAF5 100%
+    #fdfaf5 100%
   );
   pointer-events: none;
 }
