@@ -9,7 +9,11 @@ interface StreamedResponse {
   state?: string;
 }
 
-const Chat: React.FC = () => {
+interface ChatProps {
+  setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
+}
+
+const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +23,7 @@ const Chat: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setResponse("");
+    setGenerations([]); // Reset generations at the start of a new query
 
     abortControllerRef.current = new AbortController();
 
@@ -39,7 +44,7 @@ const Chat: React.FC = () => {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      const reader = res.body.getReader();
+      const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
 
@@ -62,13 +67,24 @@ const Chat: React.FC = () => {
                   setResponse(
                     (prev) => prev + `\nNEW GENERATION - ${value.label}\n`
                   );
-                } else {
+                  setGenerations((prev) => [...prev, { label: value.label, thought: "" }]);
+                } else if (value.state === "end") {
                   setResponse(
                     (prev) => prev + `\nEND GENERATION - ${value.label}\n`
+                  );
+                  setGenerations((prev) =>
+                    prev.map((gen, index) =>
+                      index === prev.length - 1 ? { ...gen, isCompleted: true } : gen
+                    )
                   );
                 }
               } else if (value.type === "chunk") {
                 setResponse((prev) => prev + (value.value ?? ""));
+                setGenerations((prev) =>
+                  prev.map((gen, index) =>
+                    index === prev.length - 1 ? { ...gen, thought: gen.thought + (value.value ?? "") } : gen
+                  )
+                );
               } else if (value.type === "outputs") {
                 console.log(value);
               }

@@ -1,27 +1,27 @@
 "use client";
 
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
 
-type ProgressItemProps = {
+interface Generation {
+  label: string;
+  thought: string;
+  isCompleted?: boolean;
+}
+
+interface ProgressProps {
+  generations: Generation[];
+}
+
+const ProgressItem: React.FC<{
   label: string;
   description: string;
-  isHighlighted?: boolean;
-  isLast?: boolean;
+  isHighlighted: boolean;
+  isLast: boolean;
   isHovered: boolean;
   onHover: (index: number) => void;
   index: number;
-};
-
-const ProgressItem = ({
-  label,
-  description,
-  isHighlighted = false,
-  isLast = false,
-  isHovered,
-  onHover,
-  index,
-}: ProgressItemProps) => {
+}> = ({ label, description, isHighlighted, isLast, isHovered, onHover, index }) => {
   return (
     <div
       className="relative flex flex-col items-center"
@@ -55,7 +55,7 @@ const ProgressItem = ({
   );
 };
 
-export default function Progress() {
+const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -67,10 +67,31 @@ export default function Progress() {
     setHoveredIndex(index);
   };
 
-  const totalItems = 3;
+  const items =
+    generations.length > 0
+      ? generations.map((gen, index) => ({
+          label: gen.label,
+          description: gen.thought,
+          isHighlighted: index === generations.length - 1 && !gen.isCompleted,
+          isLast: index === generations.length - 1,
+        }))
+      : [
+          {
+            label: "Start",
+            description: "Initial state",
+            isHighlighted: true,
+            isLast: true,
+          },
+        ];
+
+  const totalItems = items.length;
 
   const getNodePosition = (index: number) => {
-    return index === 0 ? 0 : index === totalItems - 1 ? 100 : 50;
+    return index === 0
+      ? 0
+      : index === totalItems - 1
+      ? 100
+      : (index / (totalItems - 1)) * 100;
   };
 
   if (!isMounted) {
@@ -89,30 +110,21 @@ export default function Progress() {
         ></div>
       </div>
       <div className="space-y-48 flex flex-col items-center">
-        <ProgressItem
-          label="GEN 1"
-          description="First generation Progress item. Represents the initial phase of the project."
-          isHovered={hoveredIndex === 0}
-          onHover={handleHover}
-          index={0}
-        />
-        <ProgressItem
-          label="GEN 2"
-          description="Second generation Progress item. Shows the intermediate phase of development."
-          isHovered={hoveredIndex === 1}
-          onHover={handleHover}
-          index={1}
-        />
-        <ProgressItem
-          label="GEN 3"
-          description="Third generation Progress item. Indicates the most recent or current phase."
-          isHighlighted
-          isLast
-          isHovered={hoveredIndex === 2}
-          onHover={handleHover}
-          index={2}
-        />
+        {items.map((item, index) => (
+          <ProgressItem
+            key={index}
+            label={item.label}
+            description={item.description}
+            isHighlighted={item.isHighlighted}
+            isLast={item.isLast}
+            isHovered={hoveredIndex === index}
+            onHover={handleHover}
+            index={index}
+          />
+        ))}
       </div>
     </div>
   );
-}
+};
+
+export default Progress;
