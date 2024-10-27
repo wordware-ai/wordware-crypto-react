@@ -267,7 +267,7 @@ const Chat: React.FC<ChatProps> = ({
     <div className="flex flex-col h-screen bg-gradient-to-br from-white via-white to-[#f2ffe9]">
       <div className="flex-grow overflow-auto p-6 ">
         <div className="max-w-4xl mx-auto ">
-          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-3">
+          <h3 className="text-sm border-b-[1px] border-[#969696] mx-3 pb-4 text-[#538E28] mb-3">
             <span className="uppercase text-[#457522]">APP ID:</span>{" "}
             <motion.span
               initial={{ opacity: 1 }}
