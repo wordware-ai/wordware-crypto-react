@@ -67,14 +67,19 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                   setResponse(
                     (prev) => prev + `\nNEW GENERATION - ${value.label}\n`
                   );
-                  setGenerations((prev) => [...prev, { label: value.label, thought: "" }]);
+                  setGenerations((prev) => [
+                    ...prev,
+                    { label: value.label, thought: "" },
+                  ]);
                 } else if (value.state === "end") {
                   setResponse(
                     (prev) => prev + `\nEND GENERATION - ${value.label}\n`
                   );
                   setGenerations((prev) =>
                     prev.map((gen, index) =>
-                      index === prev.length - 1 ? { ...gen, isCompleted: true } : gen
+                      index === prev.length - 1
+                        ? { ...gen, isCompleted: true }
+                        : gen
                     )
                   );
                 }
@@ -82,7 +87,9 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                 setResponse((prev) => prev + (value.value ?? ""));
                 setGenerations((prev) =>
                   prev.map((gen, index) =>
-                    index === prev.length - 1 ? { ...gen, thought: gen.thought + (value.value ?? "") } : gen
+                    index === prev.length - 1
+                      ? { ...gen, thought: gen.thought + (value.value ?? "") }
+                      : gen
                   )
                 );
               } else if (value.type === "outputs") {
