@@ -13,6 +13,28 @@ interface ChatProps {
   setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
+const ExpandableSection: React.FC<{ title: string; content: string }> = ({
+  title,
+  content,
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="ml-4 mb-2">
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <span className="mr-2">{isExpanded ? "▼" : "▶"}</span>
+        <strong>{title}:</strong>
+      </div>
+      {isExpanded && (
+        <pre className="ml-6 mt-2 whitespace-pre-wrap">{content}</pre>
+      )}
+    </div>
+  );
+};
+
 const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState<string>("");
@@ -178,21 +200,29 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
             }
 
             return (
-              <div key={index} className="mb-4 p-4 border rounded-md">
-                <h4 className="font-bold">Generation: {generation.label}</h4>
-                <p>
-                  <strong>Thought:</strong> "thought": "{thoughtObj.thought}"
-                </p>
-                <p>
-                  <strong>Action:</strong> "action": "{thoughtObj.action}"
-                </p>
-                <p>
-                  <strong>Input:</strong> "input": "{thoughtObj.input}"
-                </p>
-                {generation.isCompleted && (
-                  <p className="text-green-600">Completed</p>
-                )}
-              </div>
+              <ExpandableSection
+                key={index}
+                title={`Generation: ${generation.label}`}
+                content={
+                  <>
+                    <ExpandableSection
+                      title="Thought"
+                      content={`"thought": "${thoughtObj.thought}"`}
+                    />
+                    <ExpandableSection
+                      title="Action"
+                      content={`"action": "${thoughtObj.action}"`}
+                    />
+                    <ExpandableSection
+                      title="Input"
+                      content={`"input": "${thoughtObj.input}"`}
+                    />
+                    {generation.isCompleted && (
+                      <p className="text-green-600 ml-4">Completed</p>
+                    )}
+                  </>
+                }
+              />
             );
           })}
           <h3 className="text-lg font-medium text-black mb-4">
