@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 interface StreamedResponse {
   type: string;
@@ -21,13 +21,29 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   const [processSteps, setProcessSteps] = useState<
     Array<{ thought: string; action: string; input: string }>
   >([]);
+  const [localGenerations, setLocalGenerations] = useState<
+    Array<{
+      label: string;
+      thought: string;
+      action: string;
+      input?: string;
+      isCompleted?: boolean;
+    }>
+  >([]);
+
+  const updateGenerations = useCallback(
+    (newGenerations: any[]) => {
+      setLocalGenerations(newGenerations);
+      setGenerations(newGenerations);
+    },
+    [setGenerations]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setResponse("");
-    setProcessSteps([]);
-    setGenerations([]); // Reset generations at the start of a new query
+    updateGenerations([]); // Reset generations at the start of a new query
 
     abortControllerRef.current = new AbortController();
 
@@ -66,48 +82,55 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
               const content = JSON.parse(line);
               const value = content.value;
 
-              if (value.type === "generation") {
-                if (value.state === "start") {
-                  console.log("New generation:", value);
-                  setGenerations((prev) => {
-                    const newGenerations = [
+              if (value && typeof value === "object") {
+                if (value.type === "generation") {
+                  if (value.state === "start") {
+                    console.log("New generation:", value);
+                    updateGenerations((prev) => [
                       ...prev,
                       {
-                        label: value.label,
+                        label: value.label || "",
                         thought: value.thought || "",
                         action: value.action || "",
+                        input: value.input || "",
                       },
-                    ];
-                    console.log("Updated generations:", newGenerations);
-                    return newGenerations;
-                  });
-                } else if (value.state === "end") {
-                  setResponse(
-                    (prev) => prev + `\nEND GENERATION - ${value.label}\n`
-                  );
-                  setGenerations((prev) =>
+                    ]);
+                  } else if (value.state === "end") {
+                    updateGenerations((prev) =>
+                      prev.map((gen, index) =>
+                        index === prev.length - 1
+                          ? { ...gen, isCompleted: true }
+                          : gen
+                      )
+                    );
+                  }
+                } else if (value.type === "chunk") {
+                  updateGenerations((prev) =>
                     prev.map((gen, index) =>
                       index === prev.length - 1
-                        ? { ...gen, isCompleted: true }
+                        ? {
+                            ...gen,
+                            thought: gen.thought + (value.value ?? ""),
+                            action: gen.action || value.action || "",
+                            input: gen.input || value.input || "",
+                          }
                         : gen
                     )
                   );
                 }
               } else if (value.type === "chunk") {
-                setResponse((prev) => prev + (value.value ?? ""));
-                setGenerations((prev) =>
+                updateGenerations((prev) =>
                   prev.map((gen, index) =>
                     index === prev.length - 1
                       ? {
                           ...gen,
                           thought: gen.thought + (value.value ?? ""),
                           action: gen.action || value.action || "",
+                          input: gen.input || value.input || "",
                         }
                       : gen
                   )
                 );
-              } else if (value.type === "outputs") {
-                console.log(value);
               }
             } catch (error) {
               console.error("Error parsing chunk:", error);
@@ -141,20 +164,26 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
     <div className="flex flex-col h-screen bg-white">
       <div className="flex-grow overflow-auto p-4">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg font-medium text-black mb-4">
-            Thought Process:
-          </h3>
-          {processSteps.map((step, index) => (
+          <h3 className="text-lg font-medium text-black mb-4">Generations:</h3>
+          {localGenerations.map((generation, index) => (
             <div key={index} className="mb-4 p-4 border rounded-md">
+              <h4 className="font-bold">Generation: {generation.label}</h4>
               <p>
-                <strong>Thought:</strong> {step.thought}
+                <strong>Thought:</strong> {generation.thought}
               </p>
-              <p>
-                <strong>Action:</strong> {step.action}
-              </p>
-              <p>
-                <strong>Input:</strong> {step.input}
-              </p>
+              <div>
+                <strong>Action:</strong>
+                {generation.action && <pre>{generation.action}</pre>}
+              </div>
+              {generation.input && (
+                <div>
+                  <strong>Input:</strong>
+                  <pre>{generation.input}</pre>
+                </div>
+              )}
+              {generation.isCompleted && (
+                <p className="text-green-600">Completed</p>
+              )}
             </div>
           ))}
           <h3 className="text-lg font-medium text-black mb-4">
