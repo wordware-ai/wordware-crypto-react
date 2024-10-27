@@ -103,10 +103,10 @@ const ProgressItem: React.FC<
       <motion.div
         className="px-3 py-3 text-md flex flex-col bg-white text-black  rounded-lg w-[300px] border-[2px] border-gray-200"
         whileHover={{
-          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
+          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.3)",
         }}
         animate={{
-          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.5)" : "none",
+          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.3)" : "none",
           height: "auto",
           maxHeight: isHovered ? "200px" : "auto",
           transition: {

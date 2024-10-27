@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface StreamedResponse {
   type: string;
@@ -258,12 +258,28 @@ const Chat: React.FC<ChatProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-white ">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-white via-white to-[#f2ffe9]">
       <div className="flex-grow overflow-auto p-6 ">
         <div className="max-w-4xl mx-auto ">
           <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-[#538E28] mb-3">
             <span className="uppercase text-[#457522]">APP ID:</span>{" "}
-            3db7ccbe-a884-4894-9540-c17a2fb43509
+            <motion.span
+              initial={{ opacity: 1 }}
+              animate={{
+                opacity: [1, 0.7, 1, 0.9, 1],
+                x: [0, 1, -1, 2, 0],
+                y: [0, -1, 1, -1, 0],
+              }}
+              transition={{
+                duration: 0.2,
+                repeat: Infinity,
+                repeatType: "reverse",
+                repeatDelay: 5,
+              }}
+              className="font-mono"
+            >
+              3db7ccbe-a884-4894-9540-c17a2fb43509
+            </motion.span>
           </h3>
           <div className="p-0 rounded-lg">
             {localGenerations.map((generation, index) => {
@@ -301,7 +317,22 @@ const Chat: React.FC<ChatProps> = ({
                         <div className="space-y-1 mt-2 mb-5">
                           {thoughtObj.thought && (
                             <p className="text-sm text-[#828282]">
-                              {thoughtObj.thought}
+                              {thoughtObj.thought.startsWith(
+                                "<!DOCTYPE html"
+                              ) ? (
+                                <a
+                                  href={`data:text/html;charset=utf-8,${encodeURIComponent(
+                                    thoughtObj.thought
+                                  )}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#538E28] hover:underline"
+                                >
+                                  View Generated HTML Page
+                                </a>
+                              ) : (
+                                thoughtObj.thought
+                              )}
                             </p>
                           )}
                           {thoughtObj.action && (
@@ -345,7 +376,7 @@ const Chat: React.FC<ChatProps> = ({
       </div>
       <div className="">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg ">
+          <div className="rounded-lg ">
             <div className="p-4">
               <div className="space-y-4">
                 <motion.div
@@ -385,7 +416,7 @@ const Chat: React.FC<ChatProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 py-3  rounded-md  text-sm font-normal text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 "
+                  className="px-4 py-3  rounded-md  text-sm font-normal text-white bg-black hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 "
                 >
                   {isLoading ? "Running..." : "Submit"}
                 </button>
