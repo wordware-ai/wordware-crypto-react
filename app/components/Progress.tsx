@@ -46,44 +46,6 @@ const ProgressItem: React.FC<
   type,
   action,
 }) => {
-  const [localSummarizedDescription, setLocalSummarizedDescription] = useState(
-    summarizedDescription
-  );
-  const [localIsSummarized, setLocalIsSummarized] = useState(isSummarized);
-
-  const summarizeDescription = useCallback(async (description: string) => {
-    try {
-      console.log("Sending description to summarize:", description);
-      const response = await fetch("/api/summarize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ description }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Received summary:", data.summary);
-      return data.summary;
-    } catch (error) {
-      console.error("Error summarizing description:", error);
-      return description;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!localIsSummarized) {
-      summarizeDescription(description).then((summary) => {
-        setLocalSummarizedDescription(summary);
-        setLocalIsSummarized(true);
-      });
-    }
-  }, [description, localIsSummarized, summarizeDescription]);
-
   const getIcon = () => {
     const iconClass = "fill-white w-7 h-7 p-1"; // Square SVG with white fill
     switch (type) {
@@ -137,9 +99,9 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-shadow duration-200 ease-in-out max-w-[280px] border border-gray-200`}
+        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-shadow duration-200 ease-in-out max-w-[280px] min-w-[150px] border border-gray-200`}
         whileHover={{
-          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)", // Changed from 0.3 to 0.15
+          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
       >
         <div className="flex items-center justify-center w-full">
@@ -148,15 +110,17 @@ const ProgressItem: React.FC<
               {getIcon()}
             </span>
             <div className="flex flex-col flex-grow min-w-0">
-              <div className="uppercase font-medium truncate">{label}</div>
-              <div className="text-sm truncate">
-                {localIsSummarized ? localSummarizedDescription : description}
+              <div className="uppercase font-medium break-words">{label}</div>
+              <div className="text-sm text-wrap">
+                {isSummarized && summarizedDescription
+                  ? summarizedDescription
+                  : description}
               </div>
             </div>
           </div>
         </div>
         {action && (
-          <div className="text-xs mt-1 text-center w-full truncate">
+          <div className="text-xs mt-1 text-center w-full break-words">
             Action: {action}
           </div>
         )}
@@ -168,9 +132,9 @@ const ProgressItem: React.FC<
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="absolute top-full mt-2 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-20 w-[280px] overflow-hidden"
+            className="absolute top-full mt-2 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-20 w-[280px] max-h-[200px] overflow-y-auto"
           >
-            <p className="text-sm text-black text-center">{description}</p>
+            <p className="text-sm text-black">{description}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -190,11 +154,60 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
     setIsMounted(true);
   }, []);
 
+  const summarizeDescription = useCallback(async (description: string) => {
+    if (!description) {
+      console.error("Empty description provided for summarization");
+      return "No description available";
+    }
+
+    try {
+      console.log("Sending description to summarize:", description);
+      const response = await fetch("/api/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ description }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Received summary:", data.summary);
+      return data.summary || description;
+    } catch (error) {
+      console.error("Error summarizing description:", error);
+      return description;
+    }
+  }, []);
+
   useEffect(() => {
     if (generations.length > 3) {
       setCurrentIndex(generations.length - 3);
     }
-  }, [generations.length]);
+
+    // Only summarize the latest generation if it's new
+    const latestGeneration = generations[generations.length - 1];
+    if (
+      latestGeneration &&
+      latestGeneration.thought &&
+      !summarizedGenerations.some((g) => g.label === latestGeneration.label)
+    ) {
+      summarizeDescription(latestGeneration.thought).then((summary) => {
+        console.log("Summarized thought:", summary); // Add this line for debugging
+        setSummarizedGenerations((prev) => [
+          ...prev,
+          {
+            ...latestGeneration,
+            summarizedDescription: summary,
+            isSummarized: true,
+          },
+        ]);
+      });
+    }
+  }, [generations, summarizeDescription]);
 
   const handleHover = (index: number) => {
     setHoveredIndex(index);
@@ -270,14 +283,14 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
             onHover={handleHover}
             index={index}
             type={item.type}
-            action={item.action} // Add this line
+            action={item.action}
             summarizedDescription={
               summarizedGenerations.find((g) => g.label === item.label)
                 ?.summarizedDescription
             }
             isSummarized={
               summarizedGenerations.find((g) => g.label === item.label)
-                ?.isSummarized
+                ?.isSummarized || false
             }
           />
         ))}
