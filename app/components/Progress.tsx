@@ -106,7 +106,7 @@ const ProgressItem: React.FC<
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
         animate={{
-          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.25)" : "none",
+          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.5)" : "none",
           height: "auto",
           maxHeight: isHovered ? "200px" : "auto",
           transition: {
@@ -125,7 +125,7 @@ const ProgressItem: React.FC<
       >
         <div className="flex items-start w-full">
           <div className="flex items-start w-full">
-            <span className="mr-3 flex-shrink-0 bg-[#548E28] p-1 rounded-md">
+            <span className="mr-3 flex-shrink-0 bg-[#548E28] p-1 mt-1 rounded-md">
               {getIcon()}
             </span>
             <div className="flex flex-col flex-grow min-w-0 w-full">
