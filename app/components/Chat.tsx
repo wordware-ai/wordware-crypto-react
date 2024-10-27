@@ -64,13 +64,19 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
 
               if (value.type === "generation") {
                 if (value.state === "start") {
-                  setResponse(
-                    (prev) => prev + `\nNEW GENERATION - ${value.label}\n`
-                  );
-                  setGenerations((prev) => [
-                    ...prev,
-                    { label: value.label, thought: "" },
-                  ]);
+                  console.log("New generation:", value); // Add this line
+                  setGenerations((prev) => {
+                    const newGenerations = [
+                      ...prev,
+                      {
+                        label: value.label,
+                        thought: value.thought || "",
+                        action: value.action || "",
+                      },
+                    ];
+                    console.log("Updated generations:", newGenerations); // Add this line
+                    return newGenerations;
+                  });
                 } else if (value.state === "end") {
                   setResponse(
                     (prev) => prev + `\nEND GENERATION - ${value.label}\n`
@@ -88,7 +94,11 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                 setGenerations((prev) =>
                   prev.map((gen, index) =>
                     index === prev.length - 1
-                      ? { ...gen, thought: gen.thought + (value.value ?? "") }
+                      ? {
+                          ...gen,
+                          thought: gen.thought + (value.value ?? ""),
+                          action: gen.action || value.action || "", // Update action if it exists
+                        }
                       : gen
                   )
                 );
