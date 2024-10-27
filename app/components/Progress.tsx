@@ -101,9 +101,14 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-shadow duration-200 ease-in-out max-w-[300px] min-w-[150px] border border-gray-200`}
+        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-all duration-100 ease-in-out max-w-[300px] min-w-[150px] border border-gray-200`}
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
+        }}
+        animate={{
+          boxShadow: isHovered 
+            ? "0 0 6px 2px rgba(84, 142, 40, 0.25)"
+            : "none"
         }}
       >
         <div className="flex items-center justify-center w-full">
@@ -252,7 +257,13 @@ const Progress: React.FC<ProgressProps> = ({
   };
 
   const getNodePosition = (index: number) => {
-    return (index / (visibleItems - 1)) * 100;
+    // Convert the absolute hoveredGenerationId to a relative position
+    const relativeIndex = index - currentIndex;
+    // Only show position if the hovered item is currently visible
+    if (relativeIndex >= 0 && relativeIndex < visibleItems) {
+      return (relativeIndex / (visibleItems - 1)) * 100;
+    }
+    return 0;
   };
 
   if (!isMounted) {
@@ -262,13 +273,14 @@ const Progress: React.FC<ProgressProps> = ({
   const displayedItems = items.slice(currentIndex, currentIndex + visibleItems);
 
   return (
-    <div className="w-full h-full flex flex-col justify-center  items-center bg-[#FDFAF5] relative overflow-hidden dotted-background">
+    <div className="w-full h-full flex flex-col justify-center items-center bg-[#FDFAF5] relative overflow-hidden dotted-background">
       <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#969696] transform -translate-x-1/2">
         <div
           className="absolute top-0 left-0 w-0.5 transition-all duration-300 ease-in-out"
           style={{
             height:
-              hoveredGenerationId >= 0
+              hoveredGenerationId >= currentIndex &&
+              hoveredGenerationId < currentIndex + visibleItems
                 ? `${getNodePosition(hoveredGenerationId)}%`
                 : "0%",
             background: "linear-gradient(to bottom, #1a5d1a, #8fce00)",
