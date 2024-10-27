@@ -46,6 +46,44 @@ const ProgressItem: React.FC<
   type,
   action,
 }) => {
+  const [localSummarizedDescription, setLocalSummarizedDescription] = useState(
+    summarizedDescription
+  );
+  const [localIsSummarized, setLocalIsSummarized] = useState(isSummarized);
+
+  const summarizeDescription = useCallback(async (description: string) => {
+    try {
+      console.log("Sending description to summarize:", description);
+      const response = await fetch("/api/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ description }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Received summary:", data.summary);
+      return data.summary;
+    } catch (error) {
+      console.error("Error summarizing description:", error);
+      return description;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!localIsSummarized) {
+      summarizeDescription(description).then((summary) => {
+        setLocalSummarizedDescription(summary);
+        setLocalIsSummarized(true);
+      });
+    }
+  }, [description, localIsSummarized, summarizeDescription]);
+
   const getIcon = () => {
     const iconClass = "fill-white w-7 h-7 p-1"; // Square SVG with white fill
     switch (type) {
@@ -112,7 +150,7 @@ const ProgressItem: React.FC<
             <div className="flex flex-col flex-grow min-w-0">
               <div className="uppercase font-medium truncate">{label}</div>
               <div className="text-sm truncate">
-                {isSummarized ? summarizedDescription : description}
+                {localIsSummarized ? localSummarizedDescription : description}
               </div>
             </div>
           </div>
@@ -147,49 +185,6 @@ const Progress: React.FC<ProgressProps> = ({ generations = [] }) => {
   const [summarizedGenerations, setSummarizedGenerations] = useState<
     SummarizedGeneration[]
   >([]);
-
-  const summarizeDescription = useCallback(async (description: string) => {
-    try {
-      const response = await fetch("/api/summarize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ description }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to summarize description");
-      }
-
-      const data = await response.json();
-      return data.summary;
-    } catch (error) {
-      console.error("Error summarizing description:", error);
-      return description; // Return the original description if summarization fails
-    }
-  }, []);
-
-  useEffect(() => {
-    const summarizeNewGenerations = async () => {
-      const newGenerations = generations.slice(summarizedGenerations.length);
-      if (newGenerations.length > 0) {
-        const newSummarizedGenerations = await Promise.all(
-          newGenerations.map(async (gen) => ({
-            ...gen,
-            summarizedDescription: await summarizeDescription(gen.thought),
-            isSummarized: true,
-          }))
-        );
-        setSummarizedGenerations((prev) => [
-          ...prev.map((g) => ({ ...g, isSummarized: true })),
-          ...newSummarizedGenerations,
-        ]);
-      }
-    };
-
-    summarizeNewGenerations();
-  }, [generations, summarizedGenerations.length, summarizeDescription]);
 
   useEffect(() => {
     setIsMounted(true);
