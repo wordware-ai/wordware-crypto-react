@@ -12,7 +12,7 @@ export default function Home() {
       <section className="w-1/3 h-full overflow-hidden">
         <Progress generations={generations} />
       </section>
-      <section className="w-2/3 h-full overflow-y-auto bg-white">
+      <section className="w-2/3 h-full overflow-y-auto ">
         <Chat setGenerations={setGenerations} />
       </section>
     </div>

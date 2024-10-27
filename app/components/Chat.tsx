@@ -13,24 +13,42 @@ interface ChatProps {
   setGenerations: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-const ExpandableSection: React.FC<{ title: string; content: string }> = ({
-  title,
-  content,
-}) => {
+const ExpandableSection: React.FC<{
+  title: string;
+  content: React.ReactNode;
+}> = ({ title, content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="ml-4 mb-2">
+    <div className="mb-2  rounded-md overflow-hidden ">
       <div
-        className="flex items-center cursor-pointer"
+        className="flex items-center justify-between p-3 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <span className="mr-2">{isExpanded ? "▼" : "▶"}</span>
-        <strong>{title}:</strong>
+        <div className="flex items-center">
+          <span className="mr-2 w-4 h-4">
+            {isExpanded ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="rgba(0,0,0,0.5)"
+              >
+                <path d="M11.9999 13.1714L16.9497 8.22168L18.3639 9.63589L11.9999 15.9999L5.63599 9.63589L7.0502 8.22168L11.9999 13.1714Z"></path>
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="rgba(0,0,0,0.5)"
+              >
+                <path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"></path>
+              </svg>
+            )}
+          </span>
+          <p className="text-sm text-black ">{title}</p>
+        </div>
       </div>
-      {isExpanded && (
-        <pre className="ml-6 mt-2 whitespace-pre-wrap">{content}</pre>
-      )}
+      {isExpanded && <div className="p-3">{content}</div>}
     </div>
   );
 };
@@ -183,10 +201,10 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-[#FFF]">
       <div className="flex-grow overflow-auto p-4">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg font-medium text-black mb-4">Generations:</h3>
+          <h3 className="text-lg  text-black mb-4">Generations:</h3>
           {localGenerations.map((generation, index) => {
             let thoughtObj;
             try {
@@ -207,27 +225,30 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                   <>
                     <ExpandableSection
                       title="Thought"
-                      content={`"thought": "${thoughtObj.thought}"`}
+                      content={
+                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"thought": "${thoughtObj.thought}"`}</p>
+                      }
                     />
                     <ExpandableSection
                       title="Action"
-                      content={`"action": "${thoughtObj.action}"`}
+                      content={
+                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"action": "${thoughtObj.action}"`}</p>
+                      }
                     />
                     <ExpandableSection
                       title="Input"
-                      content={`"input": "${thoughtObj.input}"`}
+                      content={
+                        <p className="whitespace-pre-wrap text-sm text-[#656462]">{`"input": "${thoughtObj.input}"`}</p>
+                      }
                     />
                     {generation.isCompleted && (
-                      <p className="text-green-600 ml-4">Completed</p>
+                      <p className="text-green-600 mt-2 text-sm ">Completed</p>
                     )}
                   </>
                 }
               />
             );
           })}
-          <h3 className="text-lg font-medium text-black mb-4">
-            Final Response:
-          </h3>
           <div className="p-4 rounded-md text-black">
             <pre className="whitespace-pre-wrap">{response}</pre>
           </div>
@@ -235,7 +256,7 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
       </div>
       <div className="p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg border-2 border-gray-200">
+          <div className="bg-white rounded-lg ">
             <div className="p-4">
               <form
                 onSubmit={handleSubmit}
@@ -253,7 +274,7 @@ const Chat: React.FC<ChatProps> = ({ setGenerations }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-normal text-white bg-[#538E28] hover:bg-[#538E28] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   {isLoading ? "Loading..." : "Submit"}
                 </button>
