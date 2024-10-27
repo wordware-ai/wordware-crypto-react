@@ -106,21 +106,25 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className={`px-2 py-3 text-md flex flex-col items-center bg-[#548E28] text-white rounded-lg transition-shadow duration-200 ease-in-out`}
+        className={`px-6 py-3 text-md flex flex-col items-center bg-[#548E28] text-white rounded-lg transition-shadow duration-200 ease-in-out w-[280px]`}
         whileHover={{
           boxShadow: "0 0 4px 4px rgba(84, 142, 40, 0.3)",
         }}
       >
-        <div className="flex items-center justify-center w-[150px] ">
-          <span className="mr-2">{getIcon()}</span>
-          <div className="flex flex-col">
-            <div className="uppercase ml-2">{label}</div>
-            <div className="text-sm ml-2">
-              {isSummarized ? summarizedDescription : description}
+        <div className="flex items-center justify-center w-full">
+          <div className="flex items-center">
+            <span className="mr-5">{getIcon()}</span>
+            <div className="flex flex-col">
+              <div className="uppercase">{label}</div>
+              <div className="text-sm">
+                {isSummarized ? summarizedDescription : description}
+              </div>
             </div>
           </div>
         </div>
-        {action && <div className="text-xs mt-1 ml-2">Action: {action}</div>}
+        {action && (
+          <div className="text-xs mt-1 text-center">Action: {action}</div>
+        )}
       </motion.div>
       <AnimatePresence>
         {isHovered && (
