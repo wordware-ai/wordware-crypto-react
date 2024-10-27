@@ -1,86 +1,59 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-const WORDWARE_API_URL =
-  "https://app.wordware.ai/api/released-app/3db7ccbe-a884-4894-9540-c17a2fb43509/run";
-const WORDWARE_API_KEY = process.env.WORDWARE_API_KEY;
+export async function POST(req: Request) {
+  const WORDWARE_API_KEY = process.env.WORDWARE_API_KEY;
+  const WORDWARE_APP_ID = "3db7ccbe-a884-4894-9540-c17a2fb43509";
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { inputs, version } = body;
+  if (!WORDWARE_API_KEY) {
+    return NextResponse.json(
+      { error: "WORDWARE_API_KEY is not set" },
+      { status: 500 }
+    );
+  }
 
-    console.log("Request body:", body); // Log the request body
+  const { inputs } = await req.json();
 
-    if (!WORDWARE_API_KEY) {
-      console.error("WORDWARE_API_KEY is not set");
-      return NextResponse.json(
-        { error: "API key is not set" },
-        { status: 500 }
-      );
-    }
-
-    const response = await fetch(`${WORDWARE_API_URL}`, {
+  const response = await fetch(
+    `https://app.wordware.ai/api/released-app/${WORDWARE_APP_ID}/run`,
+    {
       method: "POST",
       headers: {
         Authorization: `Bearer ${WORDWARE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        inputs: {
-          question: inputs.question,
-        },
-        version: version || "^3.4",
-      }),
-    });
-
-    console.log("Wordware API response status:", response.status); // Log the response status
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Wordware API error:", errorText);
-      return NextResponse.json(
-        {
-          error: `Wordware API responded with status ${response.status}: ${errorText}`,
-        },
-        { status: response.status }
-      );
+      body: JSON.stringify({ inputs, version: "^3.4" }),
     }
+  );
 
-    // Create a new ReadableStream to forward the response
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value);
-          console.log("Received chunk:", chunk); // Log each chunk
-          controller.enqueue(value);
-        }
-        controller.close();
-      },
-    });
-
-    return new NextResponse(stream, {
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
-  } catch (error) {
-    console.error("Error in API route:", error);
+  if (!response.ok) {
     return NextResponse.json(
-      { error: `An error occurred: ${error.message}` },
-      { status: 500 }
+      { error: "Failed to fetch from Wordware API" },
+      { status: response.status }
     );
   }
-}
 
-export async function GET() {
-  return NextResponse.json(
-    { message: "GET method is not supported for this endpoint" },
-    { status: 405 }
-  );
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = response.body?.getReader();
+      if (!reader) {
+        controller.close();
+        return;
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        controller.enqueue(value);
+      }
+      controller.close();
+    },
+  });
+
+  return new NextResponse(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }
