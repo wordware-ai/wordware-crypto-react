@@ -101,26 +101,70 @@ const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className={`px-3 py-3 text-md flex flex-col items-center bg-white text-black rounded-lg transition-all duration-100 ease-in-out max-w-[300px] min-w-[150px] border border-gray-200`}
+        className="px-3 py-3 text-md flex flex-col bg-white text-black rounded-lg transition-all duration-100 ease-in-out w-[300px] border border-gray-200"
         whileHover={{
-          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.5)",
+          boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.25)",
         }}
         animate={{
-          boxShadow: isHovered ? "0 0 6px 2px rgba(84, 142, 40, 0.5)" : "none",
+          boxShadow: isHovered 
+            ? "0 0 6px 2px rgba(84, 142, 40, 0.25)"
+            : "none",
+          height: isHovered ? "auto" : "auto",
+          maxHeight: isHovered ? "200px" : "auto",
+          transition: {
+            height: {
+              type: "spring",
+              stiffness: 300,
+              damping: 30
+            }
+          }
+        }}
+        style={{
+          overflow: isHovered ? "auto" : "visible",
+          height: "fit-content"
         }}
       >
-        <div className="flex items-center justify-center w-full">
-          <div className="flex items-center">
+        <div className="flex items-start w-full">
+          <div className="flex items-start w-full">
             <span className="mr-3 flex-shrink-0 bg-[#548E28] p-1 rounded-md">
               {getIcon()}
             </span>
-            <div className="flex flex-col flex-grow min-w-0">
+            <div className="flex flex-col flex-grow min-w-0 w-full">
               <div className="uppercase font-medium break-words">{label}</div>
-              <div className="text-sm text-wrap text-[#828282]">
-                {isSummarized && summarizedDescription
-                  ? summarizedDescription
-                  : description}
-              </div>
+              <AnimatePresence mode="wait">
+                {isHovered ? (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ 
+                      duration: 0.3,
+                      ease: [0.04, 0.62, 0.23, 0.98]
+                    }}
+                    className="text-sm text-wrap text-[#828282] mt-2 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar"
+                  >
+                    {(() => {
+                      try {
+                        const thoughtObj = JSON.parse(description);
+                        return thoughtObj.thought || description;
+                      } catch (e) {
+                        return description;
+                      }
+                    })()}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 1, height: "auto" }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="text-sm text-wrap text-[#828282]"
+                  >
+                    {isSummarized && summarizedDescription
+                      ? summarizedDescription
+                      : description}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -130,28 +174,6 @@ const ProgressItem: React.FC<
           </div>
         )}
       </motion.div>
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute top-full mt-2 p-2 bg-white border border-gray-300 rounded-lg shadow-lg z-[99] w-[280px] max-h-[200px] overflow-y-auto"
-          >
-            <p className="text-sm text-black whitespace-pre-wrap break-words">
-              {(() => {
-                try {
-                  const thoughtObj = JSON.parse(description);
-                  return thoughtObj.thought || description;
-                } catch (e) {
-                  return description;
-                }
-              })()}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
