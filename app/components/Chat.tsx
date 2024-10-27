@@ -54,9 +54,7 @@ const ExpandableSection: React.FC<{
   };
 
   return (
-    <div
-      className={`${isNested ? "mb-4 ml-6" : "flex"}`}
-    >
+    <div className={`${isNested ? "mb-4 ml-6" : "flex"}`}>
       {!isNested && (
         <div className="mr-4 flex flex-col items-center">
           <div className="mb-2">{getCircleLetter(generationType)}</div>
@@ -95,10 +93,10 @@ const ExpandableSection: React.FC<{
   );
 };
 
-const Chat: React.FC<ChatProps> = ({ 
-  setGenerations, 
-  hoveredGenerationId, 
-  setHoveredGenerationId 
+const Chat: React.FC<ChatProps> = ({
+  setGenerations,
+  hoveredGenerationId,
+  setHoveredGenerationId,
 }) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState<string>("");
@@ -250,7 +248,9 @@ const Chat: React.FC<ChatProps> = ({
     <div className="flex flex-col h-screen bg-white">
       <div className="flex-grow overflow-auto p-6">
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-lg font-medium text-black mb-6">Generations:</h3>
+          <h3 className="text-sm border-b-[1px] border-[#969696] mx-6 pb-4 text-black mb-6">
+            Generations: 3db7ccbe-a884-4894-9540-c17a2fb43509
+          </h3>
           <div className="p-4 rounded-lg">
             {localGenerations.map((generation, index) => {
               let thoughtObj;
@@ -265,8 +265,8 @@ const Chat: React.FC<ChatProps> = ({
               }
 
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="pt-2"
                   onMouseEnter={() => setHoveredGenerationId(index)}
                   onMouseLeave={() => setHoveredGenerationId(-1)}

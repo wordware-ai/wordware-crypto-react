@@ -160,6 +160,47 @@ const Progress: React.FC<ProgressProps> = ({
     SummarizedGeneration[]
   >([]);
 
+  const visibleItems = 3;
+
+  // Move items and totalItems declarations up here
+  const items =
+    generations.length > 0
+      ? generations.map((gen, index) => ({
+          label: gen.label,
+          description: gen.thought,
+          isHighlighted: index === generations.length - 1 && !gen.isCompleted,
+          isLast: index === generations.length - 1,
+          type: gen.label.toUpperCase() as "NEXT" | "ANSWER" | "HTML" | "OTHER",
+          action: gen.action,
+        }))
+      : [
+          {
+            label: "START",
+            description: "Initial state",
+            isHighlighted: true,
+            isLast: true,
+            type: "OTHER",
+            action: undefined,
+          },
+        ];
+
+  const totalItems = items.length;
+
+  // Now we can use totalItems in the useEffect
+  useEffect(() => {
+    if (hoveredGenerationId >= 0) {
+      if (hoveredGenerationId < currentIndex) {
+        setCurrentIndex(hoveredGenerationId);
+      }
+      else if (hoveredGenerationId >= currentIndex + visibleItems) {
+        setCurrentIndex(Math.min(
+          hoveredGenerationId - visibleItems + 1,
+          totalItems - visibleItems
+        ));
+      }
+    }
+  }, [hoveredGenerationId, currentIndex, totalItems, visibleItems]);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -222,30 +263,6 @@ const Progress: React.FC<ProgressProps> = ({
   const handleHover = (index: number) => {
     setHoveredGenerationId(currentIndex + index);
   };
-
-  const items =
-    generations.length > 0
-      ? generations.map((gen, index) => ({
-          label: gen.label,
-          description: gen.thought,
-          isHighlighted: index === generations.length - 1 && !gen.isCompleted,
-          isLast: index === generations.length - 1,
-          type: gen.label.toUpperCase() as "NEXT" | "ANSWER" | "HTML" | "OTHER",
-          action: gen.action, // Add this line
-        }))
-      : [
-          {
-            label: "START",
-            description: "Initial state",
-            isHighlighted: true,
-            isLast: true,
-            type: "OTHER",
-            action: undefined, // Add this line
-          },
-        ];
-
-  const totalItems = items.length;
-  const visibleItems = 3;
 
   const handleScroll = (e: React.WheelEvent<HTMLDivElement>) => {
     e.preventDefault();
