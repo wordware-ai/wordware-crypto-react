@@ -19,3 +19,26 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.dotted-background {
+  position: relative;
+  background-image: radial-gradient(rgba(128, 128, 128, 0.2) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-color: #FDFAF5;
+}
+
+.dotted-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    #FDFAF5 100%
+  );
+  pointer-events: none;
+}
