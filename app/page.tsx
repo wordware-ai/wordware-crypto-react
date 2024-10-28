@@ -52,14 +52,14 @@ export default function Home() {
         ></motion.div>
 
         <div className="w-full h-screen flex flex-row overflow-hidden">
-          <section className="w-1/2 h-full overflow-hidden">
+          <section className="hidden md:block md:w-1/2 h-full overflow-hidden">
             <Progress
               generations={generations}
               hoveredGenerationId={hoveredGenerationId}
               setHoveredGenerationId={setHoveredGenerationId}
             />
           </section>
-          <section className="w-1/2 h-full overflow-y-auto border-l-[1px] border-[#969696]">
+          <section className="w-full md:w-1/2 h-full overflow-y-auto border-l-[1px] border-[#969696] ">
             <Chat
               generations={generations}
               setGenerations={setGenerations}
