@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 const WORDWARE_API_URL =
   "https://app.wordware.ai/api/released-app/3db7ccbe-a884-4894-9540-c17a2fb43509/run";
-const WORDWARE_API_KEY = process.env.WORDWARE_API_KEY;
+const NEXT_WORDWARE_API_KEY = process.env.NEXT_WORDWARE_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { inputs, version } = body;
 
-    if (!WORDWARE_API_KEY) {
-      console.error("WORDWARE_API_KEY is not set");
+    if (!NEXT_WORDWARE_API_KEY) {
+      console.error("NEXT_WORDWARE_API_KEY is not set");
       return NextResponse.json(
         { error: "API key is not set" },
         { status: 500 }
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(WORDWARE_API_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${WORDWARE_API_KEY}`,
+        Authorization: `Bearer ${NEXT_WORDWARE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

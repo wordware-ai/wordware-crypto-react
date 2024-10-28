@@ -7,8 +7,8 @@ export async function POST(req: Request) {
 
     console.log("Attempting to summarize:", description);
 
-    if (!process.env.CLAUDE_API_KEY) {
-      console.error("CLAUDE_API_KEY is not set");
+    if (!process.env.NEXT_CLAUDE_API_KEY) {
+      console.error("NEXT_CLAUDE_API_KEY is not set");
       return NextResponse.json(
         { error: "API key not configured" },
         { status: 500 }
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     const anthropic = new Anthropic({
-      apiKey: process.env.CLAUDE_API_KEY,
+      apiKey: process.env.NEXT_CLAUDE_API_KEY,
     });
 
     const response = await anthropic.messages.create({
