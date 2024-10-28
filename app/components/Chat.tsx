@@ -182,12 +182,12 @@ const Chat: React.FC<ChatProps> = ({
             {localGenerations.map((generation, index) => {
               let thoughtObj;
               try {
-                thoughtObj = JSON.parse(generation.thought || '{}');
-              } catch (_) {
+                thoughtObj = JSON.parse(generation.thought || "{}");
+              } catch {
                 thoughtObj = {
-                  thought: generation.thought || '',
-                  action: generation.action || '',
-                  input: generation.input || ''
+                  thought: generation.thought || "",
+                  action: generation.action || "",
+                  input: generation.input || "",
                 };
               }
 

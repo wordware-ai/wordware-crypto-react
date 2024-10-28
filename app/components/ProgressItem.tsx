@@ -110,9 +110,9 @@ export const ProgressItem: React.FC<
                   >
                     {(() => {
                       try {
-                        const thoughtObj = JSON.parse(description || '{}');
+                        const thoughtObj = JSON.parse(description || "{}");
                         return thoughtObj.thought || description;
-                      } catch (_) {
+                      } catch {
                         return description;
                       }
                     })()}
