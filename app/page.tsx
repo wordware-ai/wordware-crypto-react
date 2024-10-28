@@ -4,13 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Progress from "./components/Progress";
 import Chat from "./components/Chat";
-
-interface Generation {
-  id: number;
-  content: string;
-  label: string;
-  thought: string;
-}
+import { Generation } from "./types/progress";
 
 export default function Home() {
   const [generations, setGenerations] = useState<Generation[]>([]);
