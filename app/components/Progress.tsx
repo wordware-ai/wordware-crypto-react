@@ -151,7 +151,9 @@ const Progress: React.FC<ProgressProps> = ({
           {displayedItems.map((item, index) => (
             <motion.div
               key={currentIndex + index}
-              ref={(el) => (nodeRefs.current[index] = el)}
+              ref={(el) => {
+                nodeRefs.current[index] = el;
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}

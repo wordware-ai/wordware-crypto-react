@@ -109,8 +109,12 @@ export const ProgressItem: React.FC<
                     className="text-sm text-wrap text-[#828282] mt-2 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar max-h-[120px]" // Added max-h-[120px]
                   >
                     {(() => {
-                      const thoughtObj = JSON.parse(description);
-                      return thoughtObj.thought || description;
+                      try {
+                        const thoughtObj = JSON.parse(description || '{}');
+                        return thoughtObj.thought || description;
+                      } catch (_) {
+                        return description;
+                      }
                     })()}
                   </motion.div>
                 ) : (

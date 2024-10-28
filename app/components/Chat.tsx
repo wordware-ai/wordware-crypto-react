@@ -180,7 +180,16 @@ const Chat: React.FC<ChatProps> = ({
           </h3>
           <div className="p-0 rounded-lg">
             {localGenerations.map((generation, index) => {
-              const thoughtObj = JSON.parse(generation.thought);
+              let thoughtObj;
+              try {
+                thoughtObj = JSON.parse(generation.thought || '{}');
+              } catch (_) {
+                thoughtObj = {
+                  thought: generation.thought || '',
+                  action: generation.action || '',
+                  input: generation.input || ''
+                };
+              }
 
               return (
                 <div
@@ -289,7 +298,10 @@ const Chat: React.FC<ChatProps> = ({
                 </motion.div>
               </div>
               <form
-                onSubmit={handleSubmit}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit();
+                }}
                 className="flex items-center space-x-4 mt-4"
               >
                 <textarea
