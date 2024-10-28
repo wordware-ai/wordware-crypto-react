@@ -183,8 +183,11 @@ const Chat: React.FC<ChatProps> = ({
               let thoughtObj;
               try {
                 thoughtObj = JSON.parse(generation.thought);
-              } catch (e) {
-             console.log(e)
+              } catch (_) {
+                thoughtObj = {
+                  thought: generation.thought,
+                };
+              }
               return (
                 <div
                   key={index}
