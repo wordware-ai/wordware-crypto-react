@@ -2,20 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-
-interface ChatProps {
-  setGenerations: React.Dispatch<React.SetStateAction<Generation[]>>;
-  hoveredGenerationId: number;
-  setHoveredGenerationId: React.Dispatch<React.SetStateAction<number>>;
-}
-
-interface Generation {
-  label: string;
-  thought: string;
-  action: string;
-  input?: string;
-  isCompleted?: boolean;
-}
+import { Generation, ChatProps } from "../types/progress";
 
 const ExpandableSection: React.FC<{
   title: string;
@@ -113,15 +100,7 @@ const Chat: React.FC<ChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const [localGenerations, setLocalGenerations] = useState<
-    Array<{
-      label: string;
-      thought: string;
-      action: string;
-      input?: string;
-      isCompleted?: boolean;
-    }>
-  >([]);
+  const [localGenerations, setLocalGenerations] = useState<Generation[]>([]);
   const suggestions = [
     "Price of BTC?",
     "Price of ETH?",
