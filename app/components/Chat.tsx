@@ -133,7 +133,9 @@ const Chat: React.FC<ChatProps> = ({
         console.log("Fetch aborted");
       } else {
         console.error("Error:", error);
-        setQuestion("An error occurred while fetching the response.");
+        setQuestion(
+          "An error occurred while fetching the response. Are API keys set?"
+        );
       }
     } finally {
       setIsLoading(false);
