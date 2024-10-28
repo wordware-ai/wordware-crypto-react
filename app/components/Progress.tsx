@@ -40,8 +40,6 @@ const ProgressItem: React.FC<
   description,
   summarizedDescription,
   isSummarized,
-  isHighlighted,
-  isLast,
   isHovered,
   onHover,
   index,
@@ -214,26 +212,7 @@ const Progress: React.FC<ProgressProps> = ({
 
   const totalItems = items.length;
 
-  // Now we can use totalItems in the useEffect
-  useEffect(() => {
-    if (hoveredGenerationId >= 0) {
-      if (hoveredGenerationId < currentIndex) {
-        setCurrentIndex(hoveredGenerationId);
-      } else if (hoveredGenerationId >= currentIndex + visibleItems) {
-        setCurrentIndex(
-          Math.min(
-            hoveredGenerationId - visibleItems + 1,
-            totalItems - visibleItems
-          )
-        );
-      }
-    }
-  }, [hoveredGenerationId, currentIndex, totalItems, visibleItems]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+  // Move summarizeDescription outside useEffect
   const summarizeDescription = useCallback(async (description: string) => {
     if (!description) {
       console.error("Empty description provided for summarization");
@@ -261,22 +240,26 @@ const Progress: React.FC<ProgressProps> = ({
       console.error("Error summarizing description:", error);
       return description;
     }
-  }, []);
+  }, []); // Empty dependency array
 
+  // Handle index updates
   useEffect(() => {
     if (generations.length > 3) {
       setCurrentIndex(generations.length - 3);
     }
+  }, [generations.length]);
 
-    // Only summarize the latest generation if it's new
+  // Handle summarization
+  useEffect(() => {
     const latestGeneration = generations[generations.length - 1];
-    if (
-      latestGeneration &&
-      latestGeneration.thought &&
-      !summarizedGenerations.some((g) => g.label === latestGeneration.label)
-    ) {
+    if (!latestGeneration?.thought) return;
+
+    const isAlreadySummarized = summarizedGenerations.some(
+      (g) => g.label === latestGeneration.label
+    );
+
+    if (!isAlreadySummarized) {
       summarizeDescription(latestGeneration.thought).then((summary) => {
-        console.log("Summarized thought:", summary); // Add this line for debugging
         setSummarizedGenerations((prev) => [
           ...prev,
           {
@@ -287,7 +270,26 @@ const Progress: React.FC<ProgressProps> = ({
         ]);
       });
     }
-  }, [generations, summarizeDescription]);
+  }, [generations, summarizeDescription, summarizedGenerations]);
+
+  useEffect(() => {
+    if (hoveredGenerationId >= 0) {
+      if (hoveredGenerationId < currentIndex) {
+        setCurrentIndex(hoveredGenerationId);
+      } else if (hoveredGenerationId >= currentIndex + visibleItems) {
+        setCurrentIndex(
+          Math.min(
+            hoveredGenerationId - visibleItems + 1,
+            totalItems - visibleItems
+          )
+        );
+      }
+    }
+  }, [hoveredGenerationId, currentIndex, totalItems, visibleItems]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleHover = (index: number) => {
     setHoveredGenerationId(currentIndex + index);

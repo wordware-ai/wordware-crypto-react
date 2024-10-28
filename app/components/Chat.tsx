@@ -414,7 +414,7 @@ const Chat: React.FC<ChatProps> = ({
                   id="question"
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
-                  className="flex-grow border-[#969696] rounded-md border-[1px] py-3 px-3 focus:ring focus:ring-[#538E28] focus:ring-opacity-50 placeholder:text-sm placeholder:text-[#969696] text-[#969696] text-sm"
+                  className="flex-grow border-[#969696] rounded-md border-[1px] py-3 px-3 focus:ring focus:ring-[#538E28] focus:ring-opacity-50 placeholder:text-sm placeholder:text-[#969696] text-[#969696] text-sm text-[#4B5563]"
                   rows={1}
                   placeholder="Type your message here..."
                   required

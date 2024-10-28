@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
     // Create a new ReadableStream to forward the response
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = response.body.getReader();
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error("Response body is null");
+        }
         const decoder = new TextDecoder();
         let buffer = "";
 
