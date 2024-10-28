@@ -6,6 +6,7 @@ import { Generation, ChatProps } from "../types/progress";
 import { ExpandableSection } from "./ExpandableSection";
 
 const Chat: React.FC<ChatProps> = ({
+  generations,
   setGenerations,
   hoveredGenerationId,
   setHoveredGenerationId,
@@ -14,7 +15,6 @@ const Chat: React.FC<ChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const [localGenerations, setLocalGenerations] = useState<Generation[]>([]);
   const suggestions = [
     "Price of BTC?",
     "Price of ETH?",
@@ -24,13 +24,7 @@ const Chat: React.FC<ChatProps> = ({
 
   const updateGenerations = useCallback(
     (newGenerations: Generation[] | ((prev: Generation[]) => Generation[])) => {
-      if (typeof newGenerations === "function") {
-        setLocalGenerations(newGenerations);
-        setGenerations(newGenerations);
-      } else {
-        setLocalGenerations(newGenerations);
-        setGenerations(newGenerations);
-      }
+      setGenerations(newGenerations);
     },
     [setGenerations]
   );
@@ -179,7 +173,7 @@ const Chat: React.FC<ChatProps> = ({
             </motion.span>
           </h3>
           <div className="p-0 rounded-lg">
-            {localGenerations.map((generation, index) => {
+            {generations.map((generation, index) => {
               let thoughtObj;
               try {
                 thoughtObj = JSON.parse(generation.thought || "{}");
@@ -206,9 +200,9 @@ const Chat: React.FC<ChatProps> = ({
                     <ExpandableSection
                       title={`Generation: ${generation.label}`}
                       generationType={generation.label}
-                      isLast={index === localGenerations.length - 1}
+                      isLast={index === generations.length - 1}
                       defaultExpanded={true}
-                      isCurrent={index === localGenerations.length - 1}
+                      isCurrent={index === generations.length - 1}
                       isHovered={hoveredGenerationId === index}
                       content={
                         <div className="space-y-1 mt-2 mb-5">

@@ -17,9 +17,10 @@ export interface SummarizedGeneration extends Generation {
 }
 
 export interface ChatProps {
-  setGenerations: React.Dispatch<React.SetStateAction<Generation[]>>;
+  generations: Generation[];
+  setGenerations: (generations: Generation[] | ((prev: Generation[]) => Generation[])) => void;
   hoveredGenerationId: number;
-  setHoveredGenerationId: React.Dispatch<React.SetStateAction<number>>;
+  setHoveredGenerationId: (id: number) => void;
 }
 
 export interface Generation {
