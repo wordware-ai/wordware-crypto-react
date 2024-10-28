@@ -106,7 +106,7 @@ export const ProgressItem: React.FC<
                       duration: 0.3,
                       ease: [0.04, 0.62, 0.23, 0.98],
                     }}
-                    className="text-sm text-wrap text-[#828282] mt-2 overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar max-h-[120px]" // Added max-h-[120px]
+                    className="text-sm text-wrap text-[#828282] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar max-h-[120px]"
                   >
                     {(() => {
                       try {
