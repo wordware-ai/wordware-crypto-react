@@ -67,7 +67,7 @@ export const ProgressItem: React.FC<
       onMouseLeave={() => onHover(-1)}
     >
       <motion.div
-        className="px-3 py-3 text-md flex flex-col bg-white text-black min-h-[60px] rounded-lg w-[300px] border-[2px] border-gray-200"
+        className="px-3 py-3 text-md flex flex-col bg-white text-black min-h-[70px] rounded-lg w-[300px] border-[2px] border-gray-200"
         whileHover={{
           boxShadow: "0 0 6px 2px rgba(84, 142, 40, 0.3)",
         }}
