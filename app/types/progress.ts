@@ -29,3 +29,17 @@ export interface Generation {
   input?: string;
   isCompleted?: boolean;
 }
+
+export interface ProgressItemProps {
+  label: string;
+  description: string;
+  isHighlighted: boolean;
+  isLast: boolean;
+  isHovered: boolean;
+  onHover: (index: number) => void;
+  index: number;
+  type: "START" | "NEXT" | "ANSWER" | "HTML" | "OTHER";
+  action?: string;
+  summarizedDescription?: string;
+  isSummarized: boolean;
+}

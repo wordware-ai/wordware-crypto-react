@@ -1,18 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-
-interface ProgressItemProps {
-  label: string;
-  description: string;
-  isHighlighted: boolean;
-  isLast: boolean;
-  isHovered: boolean;
-  onHover: (index: number) => void;
-  index: number;
-  type: "START" | "NEXT" | "ANSWER" | "HTML" | "OTHER";
-  action?: string;
-  summarizedDescription?: string;
-  isSummarized: boolean;
-}
+import { ProgressItemProps } from "../types/progress";
 
 export const ProgressItem: React.FC<
   ProgressItemProps & { summarizedDescription?: string; isSummarized: boolean }
