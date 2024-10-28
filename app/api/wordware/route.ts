@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error in API route:", error);
     return NextResponse.json(
-      { error: `An error occurred: ${error.message}` },
+      { error: `An error occurred: ${error}` },
       { status: 500 }
     );
   }

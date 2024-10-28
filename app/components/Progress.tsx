@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Generation {
@@ -308,12 +308,15 @@ const Progress: React.FC<ProgressProps> = ({
     }
   };
 
+  // Add ref for node positions
+  const nodeRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+
   const getNodePosition = (index: number) => {
     // Convert the absolute hoveredGenerationId to a relative position
     const relativeIndex = index - currentIndex;
     // Only show position if the hovered item is currently visible
     if (relativeIndex >= 0 && relativeIndex < visibleItems) {
-      return (relativeIndex / (visibleItems - 1)) * 100;
+      return ((relativeIndex + 1) / visibleItems) * 100;
     }
     return 0;
   };
@@ -326,19 +329,12 @@ const Progress: React.FC<ProgressProps> = ({
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center bg-[#FDFAF5] relative overflow-hidden dotted-background">
-      <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-[#E5E7EB] transform -translate-x-1/2">
-        <div
-          className="absolute top-0 left-0 w-0.5 transition-all duration-300 ease-in-out"
-          style={{
-            height:
-              hoveredGenerationId >= currentIndex &&
-              hoveredGenerationId < currentIndex + visibleItems
-                ? `${getNodePosition(hoveredGenerationId)}%`
-                : "0%",
-            background: "linear-gradient(to bottom, #1a5d1a, #8fce00)",
-          }}
-        ></div>
-      </div>
+      <div 
+        className="absolute left-1/2 top-0 bottom-0 w-[2px] transform -translate-x-1/2"
+        style={{
+          background: "linear-gradient(to bottom, #1a5d1a, #8fce00)",
+        }}
+      ></div>
       <motion.div
         className="space-y-32 flex flex-col items-center"
         onWheel={handleScroll}
@@ -354,6 +350,7 @@ const Progress: React.FC<ProgressProps> = ({
           {displayedItems.map((item, index) => (
             <motion.div
               key={currentIndex + index}
+              ref={(el) => (nodeRefs.current[index] = el)}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
