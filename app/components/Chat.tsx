@@ -180,9 +180,7 @@ const Chat: React.FC<ChatProps> = ({
           </h3>
           <div className="p-0 rounded-lg">
             {localGenerations.map((generation, index) => {
-              let thoughtObj;
-
-              thoughtObj = JSON.parse(generation.thought);
+              const thoughtObj = JSON.parse(generation.thought);
 
               return (
                 <div
