@@ -135,7 +135,7 @@ const Chat: React.FC<ChatProps> = ({
         buffer = lines[lines.length - 1];
       }
     } catch (error) {
-      if (error.name === "AbortError") {
+      if (error instanceof Error && error.name === "AbortError") {
         console.log("Fetch aborted");
       } else {
         console.error("Error:", error);
