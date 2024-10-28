@@ -4,7 +4,7 @@ const nextConfig = {
     appDir: true,
   },
   env: {
-    NEXT_WORDWARE_API_KEY: process.env.NEXT_WORDWARE_API_KEY,
+    NEXT_PUBLIC_WORDWARE_API_KEY: process.env.NEXT_PUBLIC_WORDWARE_API_KEY,
   },
 };
 
