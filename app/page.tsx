@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Progress from "./components/Progress";
 import Chat from "./components/Chat";
 import { Generation } from "./types/progress";
+import Image from "next/image";
 
 export default function Home() {
   const [generations, setGenerations] = useState<Generation[]>([]);
@@ -27,10 +28,11 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="fixed inset-0 flex items-center justify-center bg-white z-50"
           >
-            <img
+            <Image
               src="/wordware.png"
               alt="Wordware Logo"
-              className="w-1/2 max-w-[400px]"
+              width={400}
+              height={200}
             />
           </motion.div>
         )}

@@ -11,7 +11,6 @@ const Chat: React.FC<ChatProps> = ({
   setHoveredGenerationId,
 }) => {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -36,10 +35,8 @@ const Chat: React.FC<ChatProps> = ({
     [setGenerations]
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
-    setResponse("");
     updateGenerations([]); // Reset generations at the start of a new query
 
     abortControllerRef.current = new AbortController();
@@ -142,7 +139,7 @@ const Chat: React.FC<ChatProps> = ({
         console.log("Fetch aborted");
       } else {
         console.error("Error:", error);
-        setResponse("An error occurred while fetching the response.");
+        setQuestion("An error occurred while fetching the response.");
       }
     } finally {
       setIsLoading(false);

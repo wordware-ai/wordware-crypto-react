@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProgressItem } from "./ProgressItem";
-import { ProgressProps, SummarizedGeneration } from "../types/progress";
+import { Generation, ProgressProps, SummarizedGeneration } from "../types/progress";
 
 // Constants
 const VISIBLE_ITEMS = 3;
@@ -18,7 +18,7 @@ const createInitialItem = () => ({
   action: undefined,
 });
 
-const mapGenerationToItem = (gen: any, index: number, length: number) => ({
+const mapGenerationToItem = (gen: Generation, index: number, length: number) => ({
   label: gen.label,
   description: gen.thought,
   isHighlighted: index === length - 1 && !gen.isCompleted,
@@ -33,7 +33,6 @@ const Progress: React.FC<ProgressProps> = ({
   setHoveredGenerationId,
 }) => {
   // State declarations
-  const [isMounted, setIsMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [summarizedGenerations, setSummarizedGenerations] = useState<
     SummarizedGeneration[]
@@ -92,10 +91,6 @@ const Progress: React.FC<ProgressProps> = ({
   };
 
   // Effects
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   useEffect(() => {
     if (generations.length > 3) {
       setCurrentIndex(generations.length - 3);
