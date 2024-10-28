@@ -15,7 +15,7 @@ const VISIBLE_ITEMS = 3;
 // Helper functions
 const createInitialItem = () => ({
   label: "START",
-  description: "Enter a question to get started!",
+  description: "Enter a question in the input field to get started!",
   isHighlighted: true,
   isLast: true,
   type: "OTHER" as const,
