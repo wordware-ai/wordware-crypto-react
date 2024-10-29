@@ -200,7 +200,7 @@ const Chat: React.FC<ChatProps> = ({
                     transition={{ duration: 0.5, delay: index * 0.2 }} // Stagger effect based on index
                   >
                     <ExpandableSection
-                      title={`Generation: ${generation.label}`}
+                      title={`${generation.label}`}
                       generationType={generation.label}
                       isLast={index === generations.length - 1}
                       defaultExpanded={true}
